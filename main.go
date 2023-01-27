@@ -1,8 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/mrkovshik/Fethiye-Outage-Bot/parsing"
+	// "github.com/mrkovshik/Fethiye-Outage-Bot/telegram"
+)
 
 
 func main() {
-	fmt.Print("Here we go")
+	fmt.Println("Here we go")
+	parsing.ParceFromMuski()
+	// telegram.TelegaBot()
 }
