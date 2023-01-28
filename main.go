@@ -7,7 +7,6 @@ import (
 	// "github.com/mrkovshik/Fethiye-Outage-Bot/telegram"
 )
 
-
 func main() {
 	fmt.Println("Here we go")
 	parsing.ParceFromMuski()
