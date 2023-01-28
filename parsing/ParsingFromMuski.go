@@ -13,11 +13,13 @@ import (
 
 type Outage struct {
 	ID        int           `db:"id"`
+	Resource  string        `db:"resource"`
 	City      string        `db:"city"`
 	District  string        `db:"district"`
 	StartDate time.Time     `db:"start_date"`
 	Duration  int		    `db:"duration"`
 	EndDate   time.Time     `db:"end_date"` 
+	SourceURL	  string	`db:"source_url"`
 }
 
 type OutageStore struct {
@@ -33,103 +35,75 @@ func NewOutageStore(db *sql.DB) *OutageStore {
 }
 
 const oldTimeFormat = "02.01.2006 15:04"
-type dbCred struct {
-	host     string
-	port     int
-	user     string
-	password string
-	dbName   string
-}
-var cred  = dbCred {
-	host: "localhost",
-	port:     5432,
-	user:     "postgres",
-	password: "17pasHres19!",
-	dbName:   "vacancies",
-	}
 
-func connectDB() (*sql.DB, error) {
-	// Connect to the database
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		cred.host, cred.port, cred.user, cred.password, cred.dbName)
-		db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		log.Fatal(err)
+
+
+
+func expandDistr (s [] Outage) [] Outage {
+	addition:=make([]Outage,0)
+	for i:= range s {
+		distList:=strings.Split(s[i].District,", ")
+if len(distList)>1{
+	s[i].District=distList[0]
+	for j:=1;j<len(distList);j++ {
+		addition=append(addition, s[i])
+		addition[j-1].District=distList[j]
 	}
-// Check the connection
-	err = db.Ping()
-	if err != nil {
-		log.Fatal(err)
+	s = append(s, addition...)
 	}
-	return db, err
+	}
+	return s
 }
-func addToDB (insertRows []Outage) string {
-	db,err:=connectDB()		
-	if err != nil {
-		errMsg:=fmt.Sprintf("Error connecting to DB: %v", err)
-		return errMsg
-	}
-		defer db.Close()
-	
-	stmt, err := db.Prepare("INSERT INTO outages (city, district, start_date ,  duration) VALUES($1, $2,$3,$4)")
-	if err != nil {
-		errMsg:=fmt.Sprintf("Error inserting registries to DB: %v", err)
-	
-		return errMsg
-	}	
-	for _,i:=range insertRows{
-	_, err = stmt.Exec(i.City,i.District, i.StartDate, i.Duration)
-	if err != nil {
-		errMsg:=fmt.Sprintf("Error inserting registries to DB: %v", err)
-	
-		return errMsg
-	}
-	stmt.Close()
-}
-	return "Запись добавлена"
-}
-func ParceFromMuski() {
+
+func parseTable (table *goquery.Selection) [] Outage{
+	var err error
 	rowSlice := make([]Outage, 0)
+	table.Find("tr").Each(func(i int, row *goquery.Selection) {
+		if i > 2 {
+		rowSlice = append(rowSlice, Outage{})
+		k := i - 3
+		row.Find("td").Each(func(j int, cell *goquery.Selection) {
+			rowSlice[k].Resource="water"
+			rowSlice[k].SourceURL="https://www.muski.gov.tr"
+			switch {
+			case j == 2:
+				rowSlice[k].City = cell.Text()
+			case j == 3:
+								rowSlice[k].District = cell.Text()
+				
+			case j == 4:
+				parsedDur, err := strconv.ParseInt(strings.Trim(cell.Text(), " Saat"), 0, 64)
+				if err != nil {
+					log.Fatal(err)
+				}
+				rowSlice[k].Duration = int(parsedDur)
+			case j == 5:
+				parsedTime := strings.Trim(cell.Text(), " ")
+				rowSlice[k].StartDate, err = time.Parse(oldTimeFormat, parsedTime)
+				if err != nil {
+					log.Fatal(err)
+				}
+				rowSlice[k].EndDate=rowSlice[k].StartDate.Add(time.Duration(rowSlice[k].Duration)*time.Hour)
+			}
+
+		})
+	}
+})
+rowSlice=expandDistr(rowSlice)
+return  rowSlice
+}
+
+func ParceFromMuski() [] Outage{
+	
 	doc, err := goquery.NewDocument("https://www.muski.gov.tr")
 	if err != nil {
 		log.Fatal(err)
 	}
 	table := doc.Find("table#plansiz")
-	table.Find("tr").Each(func(i int, row *goquery.Selection) {
-		fmt.Println("row ", i)
-		if i > 2 {
-			rowSlice = append(rowSlice, Outage{})
-			k := i - 3
-			row.Find("td").Each(func(j int, cell *goquery.Selection) {
+	rowSlice:=parseTable(table)
 
-				fmt.Println("cell ", j, cell.Text())
-				switch {
-				case j == 2:
-					rowSlice[k].City = cell.Text()
-				case j == 3:
-					rowSlice[k].District = cell.Text()
-				case j == 4:
-					parsedDur, err := strconv.ParseInt(strings.Trim(cell.Text(), " Saat"), 0, 64)
-					if err != nil {
-						log.Fatal(err)
-					}
-					rowSlice[k].Duration = int(parsedDur)
-					case j == 5:
-					parsedTime := strings.Trim(cell.Text(), " ")
-					rowSlice[k].StartDate, err = time.Parse(oldTimeFormat, parsedTime)
-					if err != nil {
-						log.Fatal(err)
-					}
-					rowSlice[k].EndDate=rowSlice[k].StartDate.Add(time.Duration(rowSlice[k].Duration)*time.Hour)
-				}
-
-			})
-		}
-		for _,i:=range rowSlice {
+	for _,i:=range rowSlice {
 			fmt.Printf("%+v\n", i)
 		}
-	
-	})
-
+		return rowSlice
 }

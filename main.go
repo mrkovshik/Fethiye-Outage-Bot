@@ -2,13 +2,20 @@ package main
 
 import (
 	"fmt"
-
+	"log"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/DB"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/parsing"
-	// "github.com/mrkovshik/Fethiye-Outage-Bot/telegram"
+
 )
+
+
 
 func main() {
 	fmt.Println("Here we go")
-	parsing.ParceFromMuski()
-	// telegram.TelegaBot()
+	muskiOutages:=parsing.ParceFromMuski()
+	err:= DB.AddToDB(muskiOutages)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
