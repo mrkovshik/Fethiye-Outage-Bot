@@ -51,12 +51,27 @@ func AddToDB (insertRows []parsing.Outage) error {
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
 	for _,i:=range insertRows{
-	_, err = stmt.Exec(i.Resource, i.City,i.District, i.StartDate, i.Duration, i.EndDate, i.SourceURL)
+	_, err = stmt.Exec( i.City,i.District,i.Resource, i.StartDate, i.Duration, i.EndDate, i.SourceURL)
 	if err != nil {
 		return err
 	}
-	stmt.Close()
+	
 }
+err=removeDup(db)
+if err != nil {
+	return err
+}
+	return err
+}
+
+func removeDup (db *sql.DB) error{
+	stmt, err := db.Prepare("DELETE FROM outages WHERE id NOT IN (SELECT MIN(id) FROM outages GROUP BY district, start_date, resource);")
+	if err != nil {
+		return err
+	}
+		defer stmt.Close()
+		_, err = stmt.Exec()
 	return err
 }

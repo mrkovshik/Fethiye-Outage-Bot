@@ -22,6 +22,17 @@ type Outage struct {
 	SourceURL	  string	`db:"source_url"`
 }
 
+type WaterOutage struct {
+   Outages	[] Outage
+}
+ 
+type PowerOutage struct {
+	Outages	[] Outage
+}
+
+type Crawler interface {
+	Crawl()
+}
 type OutageStore struct {
 	db           *sql.DB
 	// queryBuilder sq.StatementBuilderType
@@ -29,8 +40,7 @@ type OutageStore struct {
 
 func NewOutageStore(db *sql.DB) *OutageStore {
 	return &OutageStore {
-		db:           db,
-		// queryBuilder: sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
+		db: db,
 	}
 }
 
@@ -93,7 +103,7 @@ rowSlice=expandDistr(rowSlice)
 return  rowSlice
 }
 
-func ParceFromMuski() [] Outage{
+func (wo WaterOutage) Crawl()  {
 	
 	doc, err := goquery.NewDocument("https://www.muski.gov.tr")
 	if err != nil {
@@ -105,5 +115,5 @@ func ParceFromMuski() [] Outage{
 	for _,i:=range rowSlice {
 			fmt.Printf("%+v\n", i)
 		}
-		return rowSlice
+		wo.Outages=append(wo.Outages, rowSlice...)
 }
