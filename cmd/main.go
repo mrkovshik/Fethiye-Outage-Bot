@@ -48,7 +48,7 @@ func main() {
 
 	if *migration {
 		if err = goose.Up(db.DB, cfg.Database.Migrations); err != nil {
-			log.Fatal("Migration failed")
+			log.Fatalf("Migration failed, %v", err)
 
 			return
 		}

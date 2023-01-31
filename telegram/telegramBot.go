@@ -7,6 +7,25 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	)
+
+
+
+
+
+	var CityKeyboard = tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonURL("Fethiye","/fe"),
+			tgbotapi.NewInlineKeyboardButtonData("2", "2"),
+			tgbotapi.NewInlineKeyboardButtonData("3", "3"),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("4", "4"),
+			tgbotapi.NewInlineKeyboardButtonData("5", "5"),
+			tgbotapi.NewInlineKeyboardButtonData("6", "6"),
+		),
+	)
+
+
 type botStuff struct {
 	updates tgbotapi.UpdatesChannel
 	bot *tgbotapi.BotAPI
