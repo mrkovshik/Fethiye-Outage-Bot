@@ -7,7 +7,7 @@ type Outage struct {
 	City      string
 	District  string
 	StartDate time.Time
-	Duration  int
+	Duration  time.Duration
 	EndDate   time.Time
 	SourceURL string
 }
