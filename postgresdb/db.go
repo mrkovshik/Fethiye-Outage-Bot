@@ -1,13 +1,69 @@
-package db
+package postgresdb
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
-	"github.com/mrkovshik/Fethiye-Outage-Bot/parsing"
+	"time"
+
+	sq "github.com/Masterminds/squirrel"
 	_ "github.com/lib/pq"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/parsing"
 )
 
+
+type outageRow struct {
+	ID        int           `db:"id"`
+	Resource  string        `db:"resource"`
+	City      string        `db:"city"`
+	District  string        `db:"district"`
+	StartDate time.Time     `db:"start_date"`
+	Duration  int		    `db:"duration"`
+	EndDate   time.Time     `db:"end_date"` 
+	SourceURL	  string	`db:"source_url"`
+}
+type OutageStore struct {
+	db           *sql.DB
+}
+
+func NewOutageStore(db *sql.DB) *OutageStore {
+	return &OutageStore {
+		db: db,
+	}
+}
+
+type UserStore struct {
+	db           *sql.DB
+}
+
+func NewUserStore(db *sql.DB) *UserStore {
+	return &UserStore {
+		db: db,
+	}
+}
+
+
+
+func (bs *OutageStore) addOutage (ctx context.Context)  error {
+	// query:=sq.InsertBuilder.
+	// Insert()
+	// qry, args, err := query.ToSql()
+	// if err != nil {
+	// 	return bonus.Bonus{}, errors.Wrap(err, "could not build sql")
+	// }
+	query := sq.Insert("outages").
+	Columns("city", "district", "start_date").
+	Values(bs.)
+
+	b := &bonusesRow{}
+	// DB(ctx)?
+	if err = bs.db.GetContext(ctx, b, qry, args...); err != nil {
+		return bonus.Bonus{}, errors.Wrap(err, "couldn't find bonus")
+	}
+
+	return b.marshal(), nil
+}
 
 type dbCred struct {
 	host     string
@@ -24,7 +80,7 @@ var cred  = dbCred {
 	dbName:   "outageDB",
 	}
 
-func connectDB() (*sql.DB, error) {
+func connectDB(cred dbCred) (*sql.DB, error) {
 	// Connect to the database
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -40,8 +96,10 @@ func connectDB() (*sql.DB, error) {
 	}
 	return db, err
 }
+
+
 func AddToDB (insertRows []parsing.Outage) error {
-	db,err:=connectDB()		
+	db,err:=connectDB(cred)		
 	if err != nil {
 		return err
 	}

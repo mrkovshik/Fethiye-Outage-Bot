@@ -17,7 +17,7 @@ type crawler interface {
 func main() {
 	var muskiOutages parsing.WaterOutage
 	fmt.Println("Here we go")
-	muskiOutages.Crawl
+	muskiOutages.Crawl()
 	err:= db.AddToDB(muskiOutages)
 	if err != nil {
 		log.Fatal(err)

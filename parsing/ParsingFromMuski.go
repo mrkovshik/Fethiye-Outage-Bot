@@ -7,21 +7,31 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
+	"github.com/mrkovshik/Fethiye-Outage-Bot/postgresdb"
 	"github.com/PuerkitoBio/goquery"
 )
 
 type Outage struct {
-	ID        int           `db:"id"`
-	Resource  string        `db:"resource"`
-	City      string        `db:"city"`
-	District  string        `db:"district"`
-	StartDate time.Time     `db:"start_date"`
-	Duration  int		    `db:"duration"`
-	EndDate   time.Time     `db:"end_date"` 
-	SourceURL	  string	`db:"source_url"`
+	Resource  string      
+	City      string      
+	District  string      
+	StartDate time.Time    
+	Duration  int		   
+	EndDate   time.Time   
+	SourceURL	  string	
 }
 
+func (o Outage) unmarshal() postgresdb.outageRow {
+	return postgresdb.outageRow{
+		Resource : o.Resource,
+		City   :  o.City,
+		District : o.District,      
+		StartDate: o.StartDate,  
+		Duration: o.Duration,		   
+		EndDate: o.EndDate,
+		SourceURL: o.SourceURL,
+	}
+}
 type WaterOutage struct {
    Outages	[] Outage
 }
@@ -32,16 +42,6 @@ type PowerOutage struct {
 
 type Crawler interface {
 	Crawl()
-}
-type OutageStore struct {
-	db           *sql.DB
-	// queryBuilder sq.StatementBuilderType
-}
-
-func NewOutageStore(db *sql.DB) *OutageStore {
-	return &OutageStore {
-		db: db,
-	}
 }
 
 const oldTimeFormat = "02.01.2006 15:04"
