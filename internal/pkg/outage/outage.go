@@ -11,3 +11,7 @@ type Outage struct {
 	EndDate   time.Time
 	SourceURL string
 }
+
+func (one Outage) Equal(another Outage) bool {
+	return one.City == another.City && one.District == another.District && one.StartDate.Equal(another.StartDate) && one.EndDate.Equal(another.EndDate) && one.Resource == another.Resource
+}

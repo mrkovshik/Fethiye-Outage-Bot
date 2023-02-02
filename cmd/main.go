@@ -4,26 +4,26 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	// "time"
 
 	_ "github.com/jackc/pgx/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/database"
-	// "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
 
-	// "github.com/mrkovshik/Fethiye-Outage-Bot/parsing"
-	// "github.com/mrkovshik/Fethiye-Outage-Bot/postgresdb"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/crawling"
+	// "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage/postgres"
+
+	// "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
 
 	"github.com/pressly/goose/v3"
 )
 
-// type crawler interface {
-// 	crawl() []outage.Outage
-// }
 
 func main() {	
 	if err := config.ReadConfigYML("config.yml"); err != nil {
-		log.Fatal("Failed init configuration")
+		log.Fatalf("Failed init configuration %v", err)
 	}
 	cfg := config.GetConfigInstance()
 
@@ -53,13 +53,33 @@ func main() {
 		}
 	}
 
-	// TODO
-	// var muskiOutages []parsing.WaterOutage
-	// fmt.Println("Here we go")
-	// muskiOutages.Crawl()
-	// err = postgresdb.AddToDB(muskiOutages)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 
+	var Muski = crawling.OutageMuski {
+		Url:"https://www.muski.gov.tr/",
+		Resource: "water",
+	}
+r:= Muski.Crawl() 
+fmt.Println("Crawled from muski:")
+for _,i:= range r{
+	fmt.Printf("\n%+v\n",i)
+}
+
+muskiStore:=postgres.NewOutageStore(db)
+f,_:=muskiStore.FindNew(r)
+fmt.Println("Crawled remains:")
+for _,i:= range f{
+	fmt.Printf("\n%+v\n",i)
+}
+
+muskiStore.Save(f)
+
+
+// k,err:=muskiStore.GetOutagesByDistrict("")
+// if err != nil {
+// 	log.Fatalf("reading failed, %v", err)
+// 	}
+// for _,i:= range k{
+// 	fmt.Printf("%+v\n",i)
+// }
+// }
 }

@@ -41,26 +41,26 @@ func TestOutageStore_Save(t *testing.T) {
 	testStore := NewOutageStore(db)
 
 	t.Run("Regular outage", func(t *testing.T) {
-		err = testStore.Save(outage.Outage{
+		err = testStore.Save([]outage.Outage{{
 			Resource:  "water", // TODO enum
 			City:      "Fethiye",
 			District:  "Babatashi",
 			StartDate: time.Now(),
 			EndDate:   time.Now(),
 			SourceURL: "",
-		})
+		}})
 		assert.NilError(t, err)
 	})
 
 	t.Run("Broken dates outage", func(t *testing.T) {
-		err = testStore.Save(outage.Outage{
+		err = testStore.Save([]outage.Outage{{
 			Resource:  "water", // TODO enum
 			City:      "Fethiye",
 			District:  "Babatashi",
 			StartDate: time.Now(),
 			EndDate:   time.Now().Add(-1 * time.Hour),
 			SourceURL: "",
-		})
+		}})
 		assert.Error(t, err, "Start date is after End date")
 	})
 
