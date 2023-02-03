@@ -107,9 +107,9 @@ func (os *OutageStore) Read (query string) ([] outage.Outage, error) {
 	return qryRes,err
 }
 
-func (os *OutageStore) GetActiveOutagesByDistrict (distr string) ([] outage.Outage, error){
+func (os *OutageStore) GetActiveOutagesByCityDistrict (distr string, city string) ([] outage.Outage, error){
 	qrtime :=time.Now().UTC().String()[:19]
-	query := fmt.Sprintf("SELECT resource, city, district, start_date, end_date, source_url	FROM outages WHERE district ILIKE '%v' AND \"end_date\" > '%v';", ("%"+distr+"%"),qrtime)
+	query := fmt.Sprintf("SELECT resource, city, district, start_date, end_date, source_url	FROM outages WHERE district ILIKE '%v' AND city ILIKE '%v' AND \"end_date\" > '%v';", ("%"+distr+"%"),("%"+city+"%"),qrtime)
 	return os.Read(query)
 }
 
@@ -122,7 +122,7 @@ qrtime:= (t.String()[:19])
 
 func (os *OutageStore) FindNew (crawled [] outage.Outage) ([] outage.Outage,error) {
 result:=make([] outage.Outage,0)
-readed,err:=os.GetActiveOutagesByDistrict("")
+readed,err:=os.GetActiveOutagesByCityDistrict("","")
 if err != nil {
 	fmt.Println("Failed to query database:", err)
 	return [] outage.Outage{},err

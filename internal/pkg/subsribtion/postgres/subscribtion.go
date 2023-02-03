@@ -97,3 +97,8 @@ func (ss *SubsribtionStore) GetSubsByDistrict (distr string) ([] subsribtion.Sub
 	query := fmt.Sprintf("SELECT (chat_id, city, district, user_name) FROM subscribtions WHERE district=%v;",distr)
 	return ss.Read(query)
 }
+
+func (ss *SubsribtionStore) GetSubsByChatID (chatID int) ([] subsribtion.Subscribtion, error){
+	query := fmt.Sprintf("SELECT (chat_id, city, district, user_name) FROM subscribtions WHERE chat_id=%v;",chatID)
+	return ss.Read(query)
+}

@@ -43,11 +43,11 @@ func TestOutageStore_Save(t *testing.T) {
 	t.Run("Regular outage", func(t *testing.T) {
 		err = testStore.Save([]outage.Outage{{
 			Resource:  "water", // TODO enum
-			City:      "Fethiye",
-			District:  "Babatashi",
+			City:      "test sity",
+			District:  "test district",
 			StartDate: time.Now(),
-			EndDate:   time.Now(),
-			SourceURL: "",
+			EndDate:   time.Now().Add(1 * time.Hour),
+			SourceURL: "test entry",
 		}})
 		assert.NilError(t, err)
 	})
@@ -55,13 +55,37 @@ func TestOutageStore_Save(t *testing.T) {
 	t.Run("Broken dates outage", func(t *testing.T) {
 		err = testStore.Save([]outage.Outage{{
 			Resource:  "water", // TODO enum
-			City:      "Fethiye",
-			District:  "Babatashi",
+			City:      "test sity",
+			District:  "test district",
 			StartDate: time.Now(),
 			EndDate:   time.Now().Add(-1 * time.Hour),
 			SourceURL: "",
 		}})
 		assert.Error(t, err, "Start date is after End date")
 	})
+
+	var getTests = [] struct {
+		name string
+		city string
+		district string
+		wantedQnty int
+		}{
+{"just City","Limpopo","",2 },
+{"City and district","Limpopo","Ugadagada",1 },
+{"non existing city","sadfsdfasd","Ugadagada",0 },
+{"non existing district","Limpopo","sadfsdfasd",0 },
+
+		}
+
+		for _,tt:=range getTests {
+	t.Run(tt.name, func(t *testing.T) {
+		outages:=make([] outage.Outage,0)
+		outages,err = testStore.GetActiveOutagesByCityDistrict(tt.district,tt.city)
+	   if len(outages) !=tt.wantedQnty {
+		t.Errorf("want %v, get %v",tt.wantedQnty,len(outages))
+	   } 
+	
+	})
+}
 
 }
