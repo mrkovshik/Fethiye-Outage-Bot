@@ -51,6 +51,8 @@ func NewSubsribtionStore(db *sqlx.DB) *SubsribtionStore {
 	}
 }
 
+
+
 func (sstr *SubsribtionStore) Save (ss subsribtion.Subscribtion) error {
 	// TODO from Columns
 	query := `INSERT INTO subscribtions (chat_id, city, district, user_name)

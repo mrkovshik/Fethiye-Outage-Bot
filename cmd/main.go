@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+
 	// "time"
 
 	_ "github.com/jackc/pgx/v4"
@@ -11,9 +12,10 @@ import (
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/database"
 
-	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/crawling"
+	// "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/crawling"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
 	// "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
-	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage/postgres"
+	// "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage/postgres"
 
 	// "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
 
@@ -53,25 +55,28 @@ func main() {
 		}
 	}
 
+	testStore:=district.NewDistrictStore(db)
+	s,err:=testStore.GetFuzzyMatch("kfasdf ")
+fmt.Printf("%+v", s)
 
-	var Muski = crawling.OutageMuski {
-		Url:"https://www.muski.gov.tr/",
-		Resource: "water",
-	}
-r:= Muski.Crawl() 
-fmt.Println("Crawled from muski:")
-for _,i:= range r{
-	fmt.Printf("\n%+v\n",i)
-}
+// 	var Muski = crawling.OutageMuski {
+// 		Url:"https://www.muski.gov.tr/",
+// 		Resource: "water",
+// 	}
+// r:= Muski.Crawl() 
+// fmt.Println("Crawled from muski:")
+// for _,i:= range r{
+// 	fmt.Printf("\n%+v\n",i)
+// }
 
-muskiStore:=postgres.NewOutageStore(db)
-f,_:=muskiStore.FindNew(r)
-fmt.Println("Crawled remains:")
-for _,i:= range f{
-	fmt.Printf("\n%+v\n",i)
-}
+// muskiStore:=postgres.NewOutageStore(db)
+// f,_:=muskiStore.FindNew(r)
+// fmt.Println("Crawled remains:")
+// for _,i:= range f{
+// 	fmt.Printf("\n%+v\n",i)
+// }
 
-muskiStore.Save(f)
+// muskiStore.Save(f)
 
 
 // k,err:=muskiStore.GetOutagesByDistrict("")
