@@ -36,6 +36,10 @@ type Database struct {
 	Driver     string `yaml:"driver"`
 }
 
+type CrawlersURL struct {
+	Muski string `yaml:"muski"`
+}
+
 // Project - contains all parameters project information.
 type Project struct {
 	Debug       bool   `yaml:"debug"`
@@ -45,11 +49,11 @@ type Project struct {
 	CommitHash  string
 }
 
-
 // Config - contains all configuration parameters in config package.
 type Config struct {
-	Project  Project  `yaml:"project"`
-	Database Database `yaml:"database"`
+	Project     Project     `yaml:"project"`
+	Database    Database    `yaml:"database"`
+	CrawlersURL CrawlersURL `yaml:"crawlersurl"`
 }
 
 // ReadConfigYML - read configurations from file and init instance Config.

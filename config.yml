@@ -12,3 +12,6 @@ database:
   sslmode: disable
   migrations: migrations
   driver: pgx
+
+crawlersurl:
+  muski: https://www.muski.gov.tr/
