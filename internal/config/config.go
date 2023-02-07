@@ -40,6 +40,10 @@ type CrawlersURL struct {
 	Muski string `yaml:"muski"`
 }
 
+type SearchConfig struct {
+	Ratio string `yaml:"ratio"`
+}
+
 // Project - contains all parameters project information.
 type Project struct {
 	Debug       bool   `yaml:"debug"`
@@ -54,6 +58,7 @@ type Config struct {
 	Project     Project     `yaml:"project"`
 	Database    Database    `yaml:"database"`
 	CrawlersURL CrawlersURL `yaml:"crawlersurl"`
+	SearchConfig	SearchConfig		`yaml:"searchconfig"`
 }
 
 // ReadConfigYML - read configurations from file and init instance Config.

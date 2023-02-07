@@ -99,6 +99,9 @@ func TestDistrictStore_FuzzyMatch(t *testing.T) {
 {"wrong spelling","Fetie mentesiolu","Fethiye", "Menteşeoğlu"},
 {"non existing city","sadfsdfasd Karaçulha","Fethiye", "Karaçulha"},
 {"only district","Karaçulha","Fethiye", "Karaçulha"},
+{"total nonsense","lsdfhjk iorewjg","no matches", "no matches"},
+{"no space","FethiyeKaraçulha","Fethiye", "Karaçulha"},
+{"no space","Karaçulha Fethiye","Fethiye", "Karaçulha"},
 
 
 

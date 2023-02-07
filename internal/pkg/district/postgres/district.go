@@ -2,12 +2,19 @@ package district
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district"
-
 )
+func getConfig() config.Config {
+	if err := config.ReadConfigYML("config.yml"); err != nil {
+		log.Fatalf("Failed init configuration %v", err)
+	}
+	return config.GetConfigInstance()
+}
 
 type districtRow struct {
 	City      string	`db:"city"`
@@ -86,8 +93,21 @@ func (d *DistrictStore) CheckStrictMatch (cit string, dis string) (bool, error) 
 	
 return true,err
 }
+func (d *DistrictStore) fuzzyQuery (city string, dist string ) ([] district.District, error) {
+	cfg:=getConfig()
+	ratio:= cfg.SearchConfig.Ratio
+	query := fmt.Sprintf("SELECT city, district FROM districts WHERE similarity(district, '%v')>%v order by similarity(metaphone(district,10), metaphone('%v',10)) desc, similarity(metaphone(city,10), metaphone('%v',10)) desc  limit 1;", dist, ratio, dist, city)
+	found,err:=d.Read(query)
+		if err != nil {
+		fmt.Println("Failed to query database:", err)
+		
+	}
+	result:=found
+		return result, err
+}
 
 func (d *DistrictStore) GetFuzzyMatch (input string) (district.District, error) {
+
 	var city, dist string
 	var err error
 	s:=strings.Split(input," ")
@@ -95,23 +115,32 @@ func (d *DistrictStore) GetFuzzyMatch (input string) (district.District, error) 
 		return district.District{},err
 	}
 	if len(s)==1{
-		city=s[0]
+		city=""
 		dist=s[0]
 	}
 	if len(s)==2{
 		city=s[0]
 		dist=s[1]
 	}
-	query := fmt.Sprintf("SELECT city, district FROM districts order by similarity(metaphone(district,10), metaphone('%v',10)) desc, similarity(metaphone(city,10), metaphone('%v',10)) desc  limit 1;", dist, city)
-	found,err:=d.Read(query)
-	result:=district.District{}
+	found,err:=d.fuzzyQuery(city,dist)
 	if err != nil {
-		fmt.Println("Failed to query database:", err)
-		return result, err
+		return district.District{},err		
 	}
+
 	if len(found)<1 {
-		return result,err
+		found,err:=d.fuzzyQuery(dist,city)
+	if err != nil {
+		return district.District{},err		
 	}
-result=found[0]	
-return result,err
+	if len(found)<1 {		
+	 		return district.District{
+			Name: "no matches",
+			City: "no matches",
+		},err
+	} else {
+		return found[0],err
+		}
+	}
+
+return found[0],err
 }

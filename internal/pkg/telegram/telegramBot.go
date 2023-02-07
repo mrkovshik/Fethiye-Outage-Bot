@@ -4,145 +4,63 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	)
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage/postgres"
+)
 
 
+func BotRunner (ds *district.DistrictStore, muskiStore *postgres.OutageStore) {
+ // подключаемся к боту с помощью токена
+ api:=os.Getenv("TELEGRAM_APITOKEN")
 
+ bot, err := tgbotapi.NewBotAPI(api)
+   if err != nil {
+	   fmt.Println("telegram ApI error", err)
+   }
+   bot.Debug = true
+   log.Printf("Authorized on account %s", bot.Self.UserName)
 
+   u := tgbotapi.NewUpdate(0)
+   u.Timeout = 60
 
-	var CityKeyboard = tgbotapi.NewInlineKeyboardMarkup(
-		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonURL("Fethiye","/fe"),
-			tgbotapi.NewInlineKeyboardButtonData("2", "2"),
-			tgbotapi.NewInlineKeyboardButtonData("3", "3"),
-		),
-		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("4", "4"),
-			tgbotapi.NewInlineKeyboardButtonData("5", "5"),
-			tgbotapi.NewInlineKeyboardButtonData("6", "6"),
-		),
-	)
+   updates := bot.GetUpdatesChan(u)
 
-
-type botStuff struct {
-	updates tgbotapi.UpdatesChannel
-	bot *tgbotapi.BotAPI
-	chatID  int64
-}
-
-type neigborhoodMap map [string] string
-
-var fethiyeMap = neigborhoodMap {
-	"/Menteseoglu":  "menteseoglu" , 
-	"/Babatasi": "babatasi",
-	"/Ciftlik": "ciftlik_fethiye",
-}
-var bodrumMap = neigborhoodMap{
-	"/Yokusbasi":  "yokusbasi",
-	"/Tepecik": "tepecik",
-	"/Ciftlik": "ciftlik_bodrum",
-}
- 
-
-var cityMap = map [string] neigborhoodMap {
-"/Fethiye": fethiyeMap,
-"/Bodrum": bodrumMap,
-
-}
-
-func pickNeneigborhood (updates tgbotapi.UpdatesChannel,bot *tgbotapi.BotAPI, n map [string] neigborhoodMap){
-	var msg tgbotapi.MessageConfig
-	msgString:="Pick a neigborhood:\n "
-	for i:= range n {
-		msgString+=i+"\n" 
-	}	
-
-	msg = tgbotapi.NewMessage(update.Message.Chat.ID, msgString+"If you want to get back to the main menu type /back")
-	bot.Send(msg)	
-	for update := range updates {
-		if update.Message != nil { // If we got a message
-		
-			if _,ok:=cityMap[update.Message.Text]; ok{
-
-			}
-
-			}
- 
-
+   for update := range updates {
+	   if update.Message != nil { // If we got a message
+		   msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+		   if update.Message.Text=="/start"{
+			   msg.Text = "Please print your city and neigbourhood divided by space, for example 'Fethie Taşyaka'"
+	   } else {
+		   guessDistr, err:=ds.GetFuzzyMatch(update.Message.Text)
+		   if err != nil {
+			   fmt.Println("Fuzzy search error", err)
+		   }
+		   userOutages, err:=muskiStore.GetActiveOutagesByCityDistrict(guessDistr.Name, guessDistr.City)
+		   if err != nil {
+			   fmt.Println("Outages search error", err)
+		   }
+		   if guessDistr.City=="no matches" {
+			
+			msg.Text="I am sorry, but I can't find anythithg like '" + update.Message.Text + "' Maybe we should try again?\n\n" +"Please print your city and neigbourhood divided by space, for example 'Fethie Taşyaka'"
+		} else {
+		   msg.Text="Did you mean '" + guessDistr.City +" "+ guessDistr.Name + "'?\n\n"
+		   if len(userOutages)==0 {
+			   msg.Text+= "There is no outages planned in your neigborhood in the closest time"
+		   } else {
+			   msg.Text+= "Here are the closest outages found for your neigborhood:\n\n"
+			   for _,i:=range userOutages{
+				   msg.Text+= i.Resource +" outage from " + i.StartDate.Add(3*time.Hour).String()[:19] + " to " + i.EndDate.Add(3*time.Hour).String()[:19] + "\n\n"
+			   }
+		   }
 		}
+	   }
+   
+	   if _, err := bot.Send(msg); err != nil {
+		   log.Panic(err)
+	   }
 }
-
-
-
-func pickCity (updates tgbotapi.UpdatesChannel,bot *tgbotapi.BotAPI){
-	var msg tgbotapi.MessageConfig
-	msgString:="Pick a city:\n "
-	for i:= range cityMap{
-		msgString+=i+"\n" 
-	}	
-	msg = tgbotapi.NewMessage(update.Message.Chat.ID, msgString+"If you want to get back to the main menu type /back")
-	bot.Send(msg)	
-	for update := range updates {
-		if update.Message != nil { // If we got a message
-		
-			if _,ok:=cityMap[update.Message.Text]; ok{
-pickNeneigborhood(updates, bot,cityMap[update.Message.Text].neigborhoods )
-			}
-
-			}
- 
-
-		}
-}
-
-
-func dialogMain (b botStuff){
-	var msg tgbotapi.MessageConfig
-	msg = tgbotapi.NewMessage(b.chatID, "Hi there, "+update.Message.From.FirstName+"! Welcome to Fethiye Outage Bot! You can /check out the outage schedule in your neigborhood and even /subscribe to get notifications about closest outages")
-	for update := range b.updates {
-	if update.Message != nil { // If we got a message
-		
-		for update := range b.updates {
-			if update.Message != nil { // If we got a message
-}
-
-msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Hi there, "+update.Message.From.FirstName+"! Welcome to Fethiye Outage Bot! Choose your city to get information about closest outages:\n /Bodrum\n/Fethiye\n/Marmaris\n/Dalaman\n/Milas\n/Mentese")
-		b.bot.Send(msg)	
-
-			continue		
-		
-			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Come on, "+update.Message.From.FirstName+" ")
-		}
-		b.bot.Send(msg)
-	}
-	
-	}
-}
-	
-
-func main() {
-
-  // подключаемся к боту с помощью токена
-api:=os.Getenv("TELEGRAM_APITOKEN")
-
-  bot, err := tgbotapi.NewBotAPI(api)
-	if err != nil {
-		fmt.Println("telegram ApI error", err)
-	}
-	bot.Debug = true
-	log.Printf("Authorized on account %s", bot.Self.UserName)
-
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
-
-	updates := bot.GetUpdatesChan(u)
-
-	for update := range updates {
-		if update.Message != nil { // If we got a message
-			botCred:= botStuff{ updates, bot, update.Message.Chat.ID}
-			go dialogMain(botCred)
-}
-	}
+   }
 }

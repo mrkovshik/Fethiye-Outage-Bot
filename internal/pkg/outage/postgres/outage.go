@@ -6,9 +6,27 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/crawling"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
 	"github.com/pkg/errors"
 )
+func (os OutageStore) FetchOutages (cfg config.Config) {
+	muskiURL:=cfg.CrawlersURL.Muski
+	var Muski = crawling.OutageMuski {
+		Url:muskiURL,
+		Resource: "water",
+	}
+for {
+f,err:=os.FindNew(Muski.Crawl() )
+if err != nil {
+	fmt.Println("Updating data error", err)
+}
+fmt.Println("Crawling")
+os.Save(f)
+time.Sleep(30*time.Minute)
+}
+}
 
 type outageRow struct {
 	Resource  string	`db:"resource"`
@@ -127,10 +145,7 @@ if err != nil {
 	fmt.Println("Failed to query database:", err)
 	return [] outage.Outage{},err
 }
-fmt.Println("readed:")
-for _,i:= range readed{
-	fmt.Printf("\n%+v\n",i)
-}
+
 if len(readed) == 0{
 	return crawled,err
 }

@@ -35,7 +35,8 @@ VALUES ('Babataşı','Fethiye'),
 ('Beskopru','Ortaca'),
 ('Karaburun','Ortaca'),
 ('Eksiliyurt','Ortaca'),
-('Cayli','Ortaca');
+('Cayli','Ortaca')
+('Foça', 'Fethiye');
 
 
 -- +goose Down

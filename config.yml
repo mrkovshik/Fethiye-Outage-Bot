@@ -15,3 +15,6 @@ database:
 
 crawlersurl:
   muski: https://www.muski.gov.tr/
+
+searchconfig:
+  ratio: 0.2
