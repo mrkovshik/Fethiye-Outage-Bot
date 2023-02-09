@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 	"path/filepath"
 
@@ -14,6 +15,13 @@ const (
 )
 
 var cfg *Config
+
+func GetConfig() Config {
+	if err := ReadConfigYML("config.yml"); err != nil {
+		log.Fatalf("Failed init configuration %v", err)
+	}
+	return GetConfigInstance()
+}
 
 // GetConfigInstance returns service config
 func GetConfigInstance() Config {
@@ -38,6 +46,7 @@ type Database struct {
 
 type CrawlersURL struct {
 	Muski string `yaml:"muski"`
+	Aydem string `yaml:"aydem"`
 }
 
 type SearchConfig struct {

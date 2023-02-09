@@ -1,0 +1,10 @@
+[Unit]
+Description=Service for the Turkiye_Outage_Bot outage_bot
+
+[Service]
+ExecStart=/root/outage_bot/outage_bot
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

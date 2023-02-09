@@ -15,6 +15,7 @@ database:
 
 crawlersurl:
   muski: https://www.muski.gov.tr/
+  aydem: https://www.admelektrik.com.tr/assets/js/data/ADM/outages.json
 
 searchconfig:
   ratio: 0.2

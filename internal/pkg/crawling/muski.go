@@ -77,15 +77,16 @@ func (om OutageMuski) parseTable(table *goquery.Selection) []outage.Outage {
 	return rowSlice
 }
 
-func (osrc OutageMuski) Crawl() []outage.Outage {
+func (om OutageMuski) Crawl() []outage.Outage {
+	//TODO add validation here
 	outages := make([]outage.Outage, 0)
-	doc, err := goquery.NewDocument(osrc.Url)
+	doc, err := goquery.NewDocument(om.Url)
 	if err != nil {
 		log.Fatal(err)
 	}
 	table := doc.Find("table#plansiz")
-	rowSlice := osrc.parseTable(table)
-	rowSlice = osrc.expandDistr(rowSlice)
+	rowSlice := om.parseTable(table)
+	rowSlice = om.expandDistr(rowSlice)
 	outages = append(outages, rowSlice...)
 	return outages
 }

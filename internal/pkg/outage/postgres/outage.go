@@ -8,25 +8,11 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/crawling"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
 	"github.com/pkg/errors"
 )
-func (os OutageStore) FetchOutages (cfg config.Config) {
-	muskiURL:=cfg.CrawlersURL.Muski
-	var Muski = crawling.OutageMuski {
-		Url:muskiURL,
-		Resource: "water",
-	}
-for {
-f,err:=os.FindNew(Muski.Crawl() )
-if err != nil {
-	fmt.Println("Updating data error", err)
-}
-fmt.Println("Crawling")
-os.Save(f)
-time.Sleep(30*time.Minute)
-}
-}
+
 
 type outageRow struct {
 	Resource  string	`db:"resource"`
@@ -35,19 +21,22 @@ type outageRow struct {
 	StartDate time.Time	`db:"start_date"`
 	EndDate   time.Time `db:"end_date"`
 	SourceURL string	`db:"source_url"`
+	Notes	  string    `db:"notes"`
+	DateAdded time.Time `db:"date_added"`
 	// UpdatedAt  sql.NullTime `db:"updated_at"` 
 	// TODO if changed?
 	// Add enabled or processed
 }
 
-func (or *outageRow) marshal() outage.Outage {
+func (from *outageRow) marshal() outage.Outage {
 	return outage.Outage{
-		Resource: or.Resource,
-		City: or.City,
-		District: or.District,
-		StartDate: or.StartDate,
-		EndDate: or.EndDate,
-		SourceURL: or.SourceURL, 
+		Resource: from.Resource,
+		City: from.City,
+		District: from.District,
+		StartDate: from.StartDate,
+		EndDate: from.EndDate,
+		SourceURL: from.SourceURL, 
+		Notes: from.Notes, 
 	}
 }
 
@@ -62,6 +51,8 @@ func (or *outageRow) unmarshal(from outage.Outage) error {
 		StartDate: from.StartDate,
 		EndDate: from.EndDate,
 		SourceURL: from.SourceURL, 
+		Notes: from.Notes, 
+		DateAdded: time.Now().UTC(),
 	}
 	return nil
 }
@@ -84,8 +75,8 @@ func NewOutageStore(db *sqlx.DB) *OutageStore {
 
 func (os *OutageStore) Save (o [] outage.Outage) error {
 	// TODO from Columns
-	query := `INSERT INTO outages (resource, city, district, start_date, end_date, source_url)
-  			VALUES (:resource, :city, :district, :start_date, :end_date, :source_url);`
+	query := `INSERT INTO outages (resource, city, district, start_date, end_date, source_url, notes, date_added)
+  			VALUES (:resource, :city, :district, :start_date, :end_date, :source_url, :notes, :date_added);`
 	
 	var orow outageRow
 	for _,i:=range o{
@@ -138,6 +129,24 @@ qrtime:= (t.String()[:19])
 	return os.Read(query)
 }
 
+func (os *OutageStore) ValidateDistricts (crawled [] outage.Outage)([] outage.Outage,error){
+	var err error
+	unValidated:= make([] outage.Outage,0)
+	ds:= district.NewDistrictStore(os.db)
+	for _,i:= range crawled {
+ok,err:=ds.CheckStrictMatch(i.City,i.District)
+if err != nil {
+	fmt.Println("Failed to validate:", err)
+	return [] outage.Outage{},err
+}
+if !ok {
+	unValidated = append(unValidated, i)
+}
+}
+return unValidated,err
+	}
+
+
 func (os *OutageStore) FindNew (crawled [] outage.Outage) ([] outage.Outage,error) {
 result:=make([] outage.Outage,0)
 readed,err:=os.GetActiveOutagesByCityDistrict("","")
@@ -161,4 +170,38 @@ result = append(result, i)
 
 } 
 return result, err
+}
+
+func (os OutageStore) FetchOutages (cfg config.Config) {
+	muskiURL:=cfg.CrawlersURL.Muski
+	aydemURL:=cfg.CrawlersURL.Aydem
+	var Aydem = crawling.OutageAydem {
+		Url:aydemURL,
+		Resource: "power",
+	}
+	var Muski = crawling.OutageMuski {
+		Url:muskiURL,
+		Resource: "water",
+	}
+
+var crawlers = [] crawling.Crawler {
+Aydem,
+Muski,
+}
+
+fmt.Println("Crawling started")
+for {
+	crawled:=make([] outage.Outage,0)
+	for _,crw:= range crawlers{
+		crawled=append(crawled, crawling.CrawlOutages(crw)...)
+	}
+
+f,err:=os.FindNew(crawled)
+if err != nil {
+	fmt.Println("Updating data error", err)
+}
+fmt.Println("Crawling completed")
+os.Save(f)
+time.Sleep(30*time.Minute)
+}
 }

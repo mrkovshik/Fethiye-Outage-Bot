@@ -48,13 +48,10 @@ func TestDistrictStore_StrictMatch(t *testing.T) {
 {"caps","FETHIYE","Karaçulha",true },
 {"non existing city","sadfsdfasd","Karaçulha",false },
 {"non existing district","Fethiye","sadfsdfasd",false },
-
-		}
-
-		for _,tt:=range tests {
+}
+	for _,tt:=range tests {
 	t.Run(tt.name, func(t *testing.T) {
-	
-		res,_:= testStore.CheckStrictMatch(tt.city,tt.district)
+	res,_:= testStore.CheckStrictMatch(tt.city,tt.district)
 	   if res !=tt.want {
 		t.Errorf("want %v, get %v",tt.want,res)
 	   } 
