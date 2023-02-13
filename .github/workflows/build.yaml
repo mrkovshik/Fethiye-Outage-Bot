@@ -85,7 +85,6 @@ jobs:
 
   up-docker-container:
     runs-on: ubuntu-latest
-    needs: 
     steps:
       - name: Run compose
         uses: appleboy/ssh-action@v0.1.7
