@@ -26,72 +26,84 @@ jobs:
           name: outage_bot
           path: outage_bot        
 
-# deploy:
-#     runs-on: ubuntu-latest
-#     needs: [build]
-#     steps:
-#       - uses: actions/download-artifact@v3
-#         with:
-#           name: outage_bot
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: outage_bot
 
-#       - name: Display structure of downloaded files
-#         run: ls -R
+      - name: Display structure of downloaded files
+        run: ls -R
 
-#       - name: Deploy
-#         uses: appleboy/scp-action@master
-#         with:
-#           host: ${{ secrets.SSH_HOST }}
-#           username: ${{ secrets.SSH_USERNAME }}
-#           key: ${{ secrets.SSH_KEY }}
-#           source: outage_bot
-#           target: outage_bot
+      - name: Deploy
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          source: outage_bot
+          target: outage_bot
 
-#   copy-file:
-#     runs-on: ubuntu-latest
-#     needs: [deploy]
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v3
+  copy-file:
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-#       - name: Add token to env
-#         run:  sed -i "4a Environment=OUTAGE_TELEGRAM_APITOKEN=${{ secrets.OUTAGE_TELEGRAM_APITOKEN }}" outageBot.service
+      - name: Add token to env
+        run:  sed -i "4a Environment=OUTAGE_TELEGRAM_APITOKEN=${{ secrets.OUTAGE_TELEGRAM_APITOKEN }}" outageBot.service
 
-#       - name: Copy service file
-#         uses: appleboy/scp-action@master
-#         with:
-#             host: ${{ secrets.SSH_HOST }}
-#             username: ${{ secrets.SSH_USERNAME }}
-#             key: ${{ secrets.SSH_KEY }}
-#             source: insulterBot.service
-#             target: /etc/systemd/system/
+      - name: Copy service file
+        uses: appleboy/scp-action@master
+        with:
+            host: ${{ secrets.SSH_HOST }}
+            username: ${{ secrets.SSH_USERNAME }}
+            key: ${{ secrets.SSH_KEY }}
+            source: insulterBot.service
+            target: /etc/systemd/system/
 
-#       - name: Copy config file
-#         uses: appleboy/scp-action@master
-#         with:
-#             host: ${{ secrets.SSH_HOST }}
-#             username: ${{ secrets.SSH_USERNAME }}
-#             key: ${{ secrets.SSH_KEY }}
-#             source: config.yml, docker-compose.yml
-#             target: /outage_bot
+      - name: Copy config file
+        uses: appleboy/scp-action@master
+        with:
+            host: ${{ secrets.SSH_HOST }}
+            username: ${{ secrets.SSH_USERNAME }}
+            key: ${{ secrets.SSH_KEY }}
+            source: config.yml, docker-compose.yml
+            target: /outage_bot
 
-#       - name: Copy migration files
-#         uses: appleboy/scp-action@master
-#         with:
-#             host: ${{ secrets.SSH_HOST }}
-#             username: ${{ secrets.SSH_USERNAME }}
-#             key: ${{ secrets.SSH_KEY }}
-#             source: migrations/20230131121600_init.sql, migrations/20230131155500_rmduration.sql, migrations/20230202145900_user_sub_table.sql,migrations/20230204130400_city_districts_table copy.sql,migrations/20230204140700_test_cases.sql
-#             target: migrations    
+      - name: Copy migration files
+        uses: appleboy/scp-action@master
+        with:
+            host: ${{ secrets.SSH_HOST }}
+            username: ${{ secrets.SSH_USERNAME }}
+            key: ${{ secrets.SSH_KEY }}
+            source: migrations/20230213161100_merged_migration.sql, 20230213174400_insert_districts.sql
+            target: migrations    
 
-#   restart-service:
-#     runs-on: ubuntu-latest
-#     needs: [copy-file]
-#     steps:
-#       - name: Restarts the service
-#         uses: appleboy/ssh-action@v0.1.7
-#         with:
-#             host: ${{ secrets.SSH_HOST }}
-#             username: ${{ secrets.SSH_USERNAME }}
-#             key: ${{ secrets.SSH_KEY }}
-#             script: |
-#               chmod +x outage_bot/outage_bot && sudo systemctl daemon-reload && sudo systemctl restart outageBot.service && sudo systemctl status outageBot.service
+  up-docker-container:
+    runs-on: ubuntu-latest
+    needs: 
+    steps:
+      - name: Run compose
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+            host: ${{ secrets.SSH_HOST }}
+            username: ${{ secrets.SSH_USERNAME }}
+            key: ${{ secrets.SSH_KEY }}
+            script: |
+              docker compose -f /outage_bot/docker-compose.yml build  && docker compose -f /outage_bot/docker-compose.yml up
+  restart-service:
+    runs-on: ubuntu-latest
+    needs: [copy-file]
+    steps:
+      - name: Restarts the service
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+            host: ${{ secrets.SSH_HOST }}
+            username: ${{ secrets.SSH_USERNAME }}
+            key: ${{ secrets.SSH_KEY }}
+            script: |
+              chmod +x outage_bot/outage_bot && sudo systemctl daemon-reload && sudo systemctl restart outageBot.service && sudo systemctl status outageBot.service            

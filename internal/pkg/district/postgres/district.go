@@ -95,9 +95,10 @@ return true,err
 }
 func (d *DistrictStore) fuzzyQuery (city string, dist string ) ([] district.District, error) {
 	cfg:=getConfig()
-	ratio:= cfg.SearchConfig.Ratio
-	query := fmt.Sprintf("SELECT city, district FROM districts WHERE similarity(district, '%v')>%v order by similarity(metaphone(district,10), metaphone('%v',10)) desc, similarity(metaphone(city,10), metaphone('%v',10)) desc  limit 1;", dist, ratio, dist, city)
-	found,err:=d.Read(query)
+	levRatio:= cfg.SearchConfig.LevRatio //Levenstein searching ratio from config
+	simRatio:= cfg.SearchConfig.SimRatio //Similarity searching ratio from config
+	query := fmt.Sprintf("SELECT city, district FROM districts where LEVENSHTEIN(district, '%v')<%v or Similarity(district, '%v')>%v ORDER BY LEVENSHTEIN(district, '%v') asc, LEVENSHTEIN(city, '%v') asc, Similarity(district, '%v') desc, Similarity(city, '%v') desc LIMIT 1;",dist,levRatio, dist, simRatio, dist, city,dist, city, )
+		found,err:=d.Read(query)
 		if err != nil {
 		fmt.Println("Failed to query database:", err)
 		

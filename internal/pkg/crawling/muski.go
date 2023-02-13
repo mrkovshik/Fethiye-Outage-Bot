@@ -45,6 +45,7 @@ func (om OutageMuski) parseTable(table *goquery.Selection) []outage.Outage {
 		if i > 2 {
 			parsedRow:= outage.Outage{}
 				row.Find("td").Each(func(j int, cell *goquery.Selection) {
+					parsedRow.Notes=""
 				parsedRow.Resource = om.Resource
 				parsedRow.SourceURL = om.Url
 				switch {

@@ -102,7 +102,7 @@ func (os *OutageStore) Read (query string) ([] outage.Outage, error) {
 	qryRes := make([]outage.Outage, 0)
 	for rows.Next() {
 		var o = outageRow{}
-		if err := rows.Scan(&o.Resource, &o.City, &o.District, &o.StartDate, &o.EndDate, &o.SourceURL); err != nil {
+		if err := rows.Scan(&o.Resource, &o.City, &o.District, &o.StartDate, &o.EndDate, &o.SourceURL, &o.Notes); err != nil {
 			fmt.Println("Failed to scan row:", err)
 			return[] outage.Outage{}, err
 		}
@@ -118,14 +118,13 @@ func (os *OutageStore) Read (query string) ([] outage.Outage, error) {
 
 func (os *OutageStore) GetActiveOutagesByCityDistrict (distr string, city string) ([] outage.Outage, error){
 	qrtime :=time.Now().UTC().String()[:19]
-	query := fmt.Sprintf("SELECT resource, city, district, start_date, end_date, source_url	FROM outages WHERE district ILIKE '%v' AND city ILIKE '%v' AND \"end_date\" > '%v';", ("%"+distr+"%"),("%"+city+"%"),qrtime)
+	query := fmt.Sprintf("SELECT resource, city, district, start_date, end_date, source_url, notes	FROM outages WHERE district ILIKE '%v' AND city ILIKE '%v' AND end_date > '%v';", ("%"+distr+"%"),("%"+city+"%"),qrtime)
 	return os.Read(query)
 }
 
 func (os *OutageStore) GetOutagesByEndTime (t time.Time) ([] outage.Outage, error){
 qrtime:= (t.String()[:19])
-	query := fmt.Sprintf("SELECT resource, city, district, start_date, end_date, source_url FROM outages WHERE \"end_date\" > '%v';",qrtime)
-	fmt.Println("query = ", query)
+	query := fmt.Sprintf("SELECT resource, city, district, start_date, end_date, source_url, notes FROM outages WHERE end_date > '%v';",qrtime)
 	return os.Read(query)
 }
 

@@ -18,4 +18,5 @@ crawlersurl:
   aydem: https://www.admelektrik.com.tr/assets/js/data/ADM/outages.json
 
 searchconfig:
-  ratio: 0.2
+  simratio: 0.5
+  levratio: 3

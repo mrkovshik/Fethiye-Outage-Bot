@@ -1,17 +1,5 @@
 -- +goose Up
 -- SQL in this section is executed when the migration is applied.
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "fuzzystrmatch";
-CREATE EXTENSION IF NOT EXISTS "pg_trgm";
-CREATE TABLE IF NOT EXISTS districts (
-    id uuid default uuid_generate_v4() not null
-        constraint districts_pkey
-            primary key,
-    district character varying(255) NOT NULL,
-    city character varying(255) NOT NULL
-   
-);
-
 INSERT INTO districts (district, city)
 VALUES 
 ('Tuzla','Fethiye'),
@@ -517,12 +505,5 @@ VALUES
 ('Çavdır','Kavaklıdere'),
 ('Yeşilköy','Kavaklıdere'),
 ('Çamlıbel','Kavaklıdere');
-
-
 -- +goose Down
 -- SQL in this section is executed when the migration is rolled back.
-
-DROP TABLE IF EXISTS districts;
-DROP EXTENSION IF EXISTS "uuid-ossp";
-DROP EXTENSION IF EXISTS "fuzzystrmatch";
-DROP EXTENSION IF EXISTS "pg_trgm";

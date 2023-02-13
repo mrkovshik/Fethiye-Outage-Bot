@@ -12,7 +12,7 @@ import (
 )
 
 
-func BotRunner (ds *district.DistrictStore, muskiStore *postgres.OutageStore) {
+func BotRunner (ds *district.DistrictStore, store *postgres.OutageStore) {
  // подключаемся к боту с помощью токена
  api:=os.Getenv("TELEGRAM_APITOKEN")
 
@@ -38,7 +38,7 @@ func BotRunner (ds *district.DistrictStore, muskiStore *postgres.OutageStore) {
 		   if err != nil {
 			   fmt.Println("Fuzzy search error", err)
 		   }
-		   userOutages, err:=muskiStore.GetActiveOutagesByCityDistrict(guessDistr.Name, guessDistr.City)
+		   userOutages, err:=store.GetActiveOutagesByCityDistrict(guessDistr.Name, guessDistr.City)
 		   if err != nil {
 			   fmt.Println("Outages search error", err)
 		   }
@@ -50,9 +50,15 @@ func BotRunner (ds *district.DistrictStore, muskiStore *postgres.OutageStore) {
 		   if len(userOutages)==0 {
 			   msg.Text+= "There is no outages planned in your neigborhood in the closest time"
 		   } else {
-			   msg.Text+= "Here are the closest outages found for your neigborhood:\n\n"
+			   msg.Text+= "**Here are the closest outages found for your neigborhood:**\n\n"
 			   for _,i:=range userOutages{
-				   msg.Text+= i.Resource +" outage from " + i.StartDate.Add(3*time.Hour).String()[:19] + " to " + i.EndDate.Add(3*time.Hour).String()[:19] + "\n\n"
+				   msg.Text+="**"+i.Resource +" outage** from " + i.StartDate.Add(3*time.Hour).String()[:19] + " to " + i.EndDate.Add(3*time.Hour).String()[:19] + "\n"
+				   if len(i.Notes)>3{
+					msg.Text+="**In the next areas and streets:** "+i.Notes+"\n\n"
+				   } else {
+					msg.Text+="\n"
+				   }
+
 			   }
 		   }
 		}

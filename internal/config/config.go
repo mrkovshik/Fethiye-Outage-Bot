@@ -50,7 +50,8 @@ type CrawlersURL struct {
 }
 
 type SearchConfig struct {
-	Ratio string `yaml:"ratio"`
+	LevRatio string `yaml:"levratio"`
+	SimRatio string `yaml:"simratio"`
 }
 
 // Project - contains all parameters project information.
