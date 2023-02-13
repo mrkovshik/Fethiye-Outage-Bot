@@ -15,7 +15,7 @@ jobs:
           go-version: 1.18
 
       - name: Build
-        run: go build -vo outage_bot .
+        run: go build -v outage_bot .
 
       - name: Test
         run: go test -v ./...
