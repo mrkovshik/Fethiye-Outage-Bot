@@ -64,15 +64,24 @@ jobs:
             source: outageBot.service
             target: /etc/systemd/system/
 
-      - name: Copy config and docker file
+      - name: Copy config file
         uses: appleboy/scp-action@master
         with:
             host: ${{ secrets.SSH_HOST }}
             username: ${{ secrets.SSH_USERNAME }}
             key: ${{ secrets.SSH_KEY }}
-            source: config.yml, docker-compose.yml
+            source: config.yml
             target: /outage_bot/
 
+      - name: Copy docker file
+        uses: appleboy/scp-action@master
+        with:
+            host: ${{ secrets.SSH_HOST }}
+            username: ${{ secrets.SSH_USERNAME }}
+            key: ${{ secrets.SSH_KEY }}
+            source: docker-compose.yml
+            target: /outage_bot/
+            
       - name: Copy migration files
         uses: appleboy/scp-action@master
         with:
