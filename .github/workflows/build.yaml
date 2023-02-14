@@ -45,7 +45,7 @@ jobs:
           source: outage_bot
           target: outage_bot
 
-  copy-file:
+  copy-serv-file:
     runs-on: ubuntu-latest
     needs: [deploy]
     steps:
@@ -64,9 +64,13 @@ jobs:
             source: outageBot.service
             target: /etc/systemd/system/
 
+  copy-conf-file:
+    runs-on: ubuntu-latest
+    needs: [copy-serv-file]
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
+
       - name: Copy config file
         uses: appleboy/scp-action@master
         with:
