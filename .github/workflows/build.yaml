@@ -78,7 +78,7 @@ jobs:
             username: ${{ secrets.SSH_USERNAME }}
             key: ${{ secrets.SSH_KEY }}
             source: config.yml, docker-compose.yml
-            target: /outage_bot/
+            target: outage_bot/
 
   copy-migr-file:
     runs-on: ubuntu-latest
@@ -94,7 +94,7 @@ jobs:
             username: ${{ secrets.SSH_USERNAME }}
             key: ${{ secrets.SSH_KEY }}
             source: migrations/20230213161100_merged_migration.sql, 20230213174400_insert_districts.sql 
-            target: /outage_bot/migrations/  
+            target: outage_bot/migrations/  
 
   up-docker-container:
     runs-on: ubuntu-latest
@@ -107,7 +107,7 @@ jobs:
             username: ${{ secrets.SSH_USERNAME }}
             key: ${{ secrets.SSH_KEY }}
             script: |
-              docker compose -f /outage_bot/docker-compose.yml build  && docker compose -f /outage_bot/docker-compose.yml up -d
+              docker compose -f outage_bot/docker-compose.yml build  && docker compose -f outage_bot/docker-compose.yml up -d
 
   restart-service:
     runs-on: ubuntu-latest
