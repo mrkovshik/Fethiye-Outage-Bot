@@ -19,7 +19,6 @@ jobs:
 
       # - name: Test
       #   run: go test -v ./...
-
       - name: Transfer
         uses: actions/upload-artifact@v3
         with:
@@ -62,7 +61,7 @@ jobs:
             host: ${{ secrets.SSH_HOST }}
             username: ${{ secrets.SSH_USERNAME }}
             key: ${{ secrets.SSH_KEY }}
-            source: insulterBot.service
+            source: outageBot.service
             target: /etc/systemd/system/
 
       - name: Copy config file
@@ -80,12 +79,22 @@ jobs:
             host: ${{ secrets.SSH_HOST }}
             username: ${{ secrets.SSH_USERNAME }}
             key: ${{ secrets.SSH_KEY }}
-            source: migrations/20230213161100_merged_migration.sql, 20230213174400_insert_districts.sql
+            source: migrations/20230213161100_merged_migration.sql, 20230213174400_insert_districts.sql 
             target: migrations    
+
+      - name: Copy docker files
+        uses: appleboy/scp-action@master
+        with:
+            host: ${{ secrets.SSH_HOST }}
+            username: ${{ secrets.SSH_USERNAME }}
+            key: ${{ secrets.SSH_KEY }}
+            source: docker-compose.yml
+            target: .  
 
   up-docker-container:
     runs-on: ubuntu-latest
-    steps:
+    needs: [copy-file]
+    steps:    
       - name: Run compose
         uses: appleboy/ssh-action@v0.1.7
         with:
