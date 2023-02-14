@@ -64,6 +64,9 @@ jobs:
             source: outageBot.service
             target: /etc/systemd/system/
 
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
       - name: Copy config file
         uses: appleboy/scp-action@master
         with:
