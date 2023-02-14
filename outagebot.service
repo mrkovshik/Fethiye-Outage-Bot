@@ -5,6 +5,8 @@ Description=Service for the Turkiye_Outage_Bot outage_bot
 ExecStart=/root/outage_bot/outage_bot
 Restart=always
 RestartSec=5
+LogLevelMax=6
+WorkingDirectory=/root/outage_bot
 
 [Install]
 WantedBy=multi-user.target

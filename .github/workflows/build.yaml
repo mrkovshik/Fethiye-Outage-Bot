@@ -61,7 +61,7 @@ jobs:
             host: ${{ secrets.SSH_HOST }}
             username: ${{ secrets.SSH_USERNAME }}
             key: ${{ secrets.SSH_KEY }}
-            source: outageBot.service
+            source: outagebot.service
             target: /etc/systemd/system/
 
   copy-conf-file:
@@ -71,14 +71,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Copy config and docker file
+      - name: Copy config file
         uses: appleboy/scp-action@master
         with:
             host: ${{ secrets.SSH_HOST }}
             username: ${{ secrets.SSH_USERNAME }}
             key: ${{ secrets.SSH_KEY }}
-            source: config.yml, docker-compose.yml
-            target: .
+            source: config.yml
+            target: ./outage_bot/
 
   copy-migr-file:
     runs-on: ubuntu-latest
@@ -94,20 +94,7 @@ jobs:
             username: ${{ secrets.SSH_USERNAME }}
             key: ${{ secrets.SSH_KEY }}
             source: migrations/20230213161100_merged_migration.sql, migrations/20230213174400_insert_districts.sql 
-            target: . 
-
-  up-docker-container:
-    runs-on: ubuntu-latest
-    needs: [copy-conf-file]
-    steps:    
-      - name: Run compose
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-            host: ${{ secrets.SSH_HOST }}
-            username: ${{ secrets.SSH_USERNAME }}
-            key: ${{ secrets.SSH_KEY }}
-            script: |
-              docker compose -f docker-compose.yml build  && docker compose -f docker-compose.yml up -d
+            target: ./outage_bot/
 
   restart-service:
     runs-on: ubuntu-latest
@@ -120,4 +107,4 @@ jobs:
             username: ${{ secrets.SSH_USERNAME }}
             key: ${{ secrets.SSH_KEY }}
             script: |
-              chmod +x ./outage_bot/outage_bot && sudo systemctl daemon-reload && sudo systemctl restart outageBot.service && sudo systemctl status outageBot.service            
+              chmod +x ./outage_bot/outage_bot && sudo systemctl daemon-reload && sudo systemctl restart outagebot.service && sudo systemctl status outagebot.service            
