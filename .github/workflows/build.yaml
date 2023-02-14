@@ -71,24 +71,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Copy config file
+      - name: Copy config and docker file
         uses: appleboy/scp-action@master
         with:
             host: ${{ secrets.SSH_HOST }}
             username: ${{ secrets.SSH_USERNAME }}
             key: ${{ secrets.SSH_KEY }}
-            source: config.yml
+            source: config.yml, docker-compose.yml
             target: /outage_bot/
 
-      - name: Copy docker file
-        uses: appleboy/scp-action@master
-        with:
-            host: ${{ secrets.SSH_HOST }}
-            username: ${{ secrets.SSH_USERNAME }}
-            key: ${{ secrets.SSH_KEY }}
-            source: docker-compose.yml
-            target: /outage_bot/
-            
+  copy-conf-file:
+    runs-on: ubuntu-latest
+    needs: [copy-conf-file]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3    
+             
       - name: Copy migration files
         uses: appleboy/scp-action@master
         with:
