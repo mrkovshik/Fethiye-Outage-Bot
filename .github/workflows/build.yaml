@@ -107,7 +107,8 @@ jobs:
             username: ${{ secrets.SSH_USERNAME }}
             key: ${{ secrets.SSH_KEY }}
             script: |
-              docker compose -f /outage_bot/docker-compose.yml build  && docker compose -f /outage_bot/docker-compose.yml up
+              docker compose -f /outage_bot/docker-compose.yml build  && docker compose -f /outage_bot/docker-compose.yml up -d
+
   restart-service:
     runs-on: ubuntu-latest
     needs: [up-docker-container]
