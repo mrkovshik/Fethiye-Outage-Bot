@@ -10,6 +10,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
+
 )
 
 
