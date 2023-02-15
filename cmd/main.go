@@ -3,11 +3,12 @@ package main
 import (
 	"flag"
 	"log"
+
 	_ "github.com/jackc/pgx/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/database"
-	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
+	district "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
 	"github.com/robfig/cron"
 
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage/postgres"
@@ -38,5 +39,4 @@ func main() {
 		log.Fatalf("Sceduler error %v", err)
 	}
 	telegram.BotRunner(ds, store)
-
 }
