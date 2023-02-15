@@ -54,6 +54,10 @@ type SearchConfig struct {
 	SimRatio string `yaml:"simratio"`
 }
 
+type SchedulerConfig struct {
+	FetchPeriod string `yaml:"fetch_period"`
+}
+
 // Project - contains all parameters project information.
 type Project struct {
 	Debug       bool   `yaml:"debug"`
@@ -69,6 +73,7 @@ type Config struct {
 	Database    Database    `yaml:"database"`
 	CrawlersURL CrawlersURL `yaml:"crawlersurl"`
 	SearchConfig	SearchConfig		`yaml:"searchconfig"`
+	SchedulerConfig	SchedulerConfig		`yaml:"schedulerconfig"`
 }
 
 // ReadConfigYML - read configurations from file and init instance Config.

@@ -2,17 +2,13 @@ package main
 
 import (
 	"flag"
-
-
 	"log"
-
 	_ "github.com/jackc/pgx/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/database"
-
-	// "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/crawling"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
+	"github.com/robfig/cron"
 
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage/postgres"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/telegram"
@@ -20,10 +16,6 @@ import (
 )
 
 var err error
-
-
-
-
 
 func main() {
 	cfg := config.GetConfig()
@@ -37,10 +29,14 @@ func main() {
 			return
 		}
 	}
-
+	c := cron.New()
 	store := postgres.NewOutageStore(db)
 	ds := district.NewDistrictStore(db)
-	go store.FetchOutages(cfg)
+	err := c.AddFunc(cfg.SchedulerConfig.FetchPeriod, func() { store.FetchOutages(cfg) })
+	c.Start()
+	if err != nil {
+		log.Fatalf("Sceduler error %v", err)
+	}
 	telegram.BotRunner(ds, store)
 
 }

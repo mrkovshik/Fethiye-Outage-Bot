@@ -94,11 +94,16 @@ func (d *DistrictStore) CheckStrictMatch (cit string, dis string) (bool, error) 
 return true,err
 }
 func (d *DistrictStore) fuzzyQuery (city string, dist string ) ([] district.District, error) {
+	var query string
 	cfg:=getConfig()
 	levRatio:= cfg.SearchConfig.LevRatio //Levenstein searching ratio from config
 	simRatio:= cfg.SearchConfig.SimRatio //Similarity searching ratio from config
-	query := fmt.Sprintf("SELECT city, district FROM districts where LEVENSHTEIN(district, '%v')<%v or Similarity(district, '%v')>%v ORDER BY LEVENSHTEIN(district, '%v') asc, LEVENSHTEIN(city, '%v') asc, Similarity(district, '%v') desc, Similarity(city, '%v') desc LIMIT 1;",dist,levRatio, dist, simRatio, dist, city,dist, city, )
-		found,err:=d.Read(query)
+	if city==""{
+		query = fmt.Sprintf("SELECT city, district FROM districts where LEVENSHTEIN(district, '%v')<%v or Similarity(district, '%v')>%v ORDER BY LEVENSHTEIN(district, '%v') asc, Similarity(district, '%v') desc LIMIT 1;",dist,levRatio, dist, simRatio, dist, dist,)
+	} else {
+	query = fmt.Sprintf("SELECT city, district FROM districts where (LEVENSHTEIN(district, '%v')<%v or Similarity(district, '%v')>%v) and (LEVENSHTEIN(city, '%v')<%v or Similarity(city, '%v') >%v) ORDER BY LEVENSHTEIN(district, '%v') asc, LEVENSHTEIN(city, '%v') asc, Similarity(district, '%v') desc, Similarity(city, '%v') desc LIMIT 1;",dist,levRatio, dist, simRatio, city,levRatio, city, simRatio, dist, city,dist, city, )
+	}	
+	found,err:=d.Read(query)
 		if err != nil {
 		fmt.Println("Failed to query database:", err)
 		

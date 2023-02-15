@@ -15,7 +15,6 @@ import (
 func BotRunner (ds *district.DistrictStore, store *postgres.OutageStore) {
  // подключаемся к боту с помощью токена
  api:=os.Getenv("OUTAGE_TELEGRAM_APITOKEN")
-
  bot, err := tgbotapi.NewBotAPI(api)
    if err != nil {
 	   fmt.Println("telegram ApI error", err)

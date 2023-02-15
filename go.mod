@@ -6,6 +6,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/pkg/errors v0.9.1
+	github.com/robfig/cron v1.2.0
 	gotest.tools v2.2.0+incompatible
 )
 
