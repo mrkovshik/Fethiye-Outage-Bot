@@ -7,8 +7,13 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
-	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district"
+
 )
+type District struct {
+	Name string
+	City string
+}
+
 
 func getConfig() config.Config {
 	if err := config.ReadConfigYML("config.yml"); err != nil {
@@ -22,14 +27,14 @@ type districtRow struct {
 	Name string `db:"district"`
 }
 
-func (d *districtRow) marshal() district.District {
-	return district.District{
+func (d *districtRow) marshal() District {
+	return District{
 		City: d.City,
 		Name: d.Name,
 	}
 }
 
-func (d *districtRow) unmarshal(from district.District) error {
+func (d *districtRow) unmarshal(from District) error {
 	*d = districtRow{
 		City: from.City,
 		Name: from.Name,
@@ -53,26 +58,26 @@ func NewDistrictStore(db *sqlx.DB) *DistrictStore {
 	}
 }
 
-func (sstr *DistrictStore) Read(query string) ([]district.District, error) {
+func (sstr *DistrictStore) Read(query string) ([]District, error) {
 	rows, err := sstr.db.Query(query)
 	if err != nil {
 		fmt.Println("Failed to query database:", err)
-		return []district.District{}, err
+		return []District{}, err
 	}
 	defer rows.Close()
 
-	qryRes := make([]district.District, 0)
+	qryRes := make([]District, 0)
 	for rows.Next() {
 		var s districtRow
 		if err := rows.Scan(&s.City, &s.Name); err != nil {
 			fmt.Println("Failed to scan row:", err)
-			return []district.District{}, err
+			return []District{}, err
 		}
 		qryRes = append(qryRes, s.marshal())
 	}
 	if err := rows.Err(); err != nil {
 		fmt.Println("Error iterating through rows:", err)
-		return []district.District{}, err
+		return []District{}, err
 	}
 
 	return qryRes, err
@@ -91,7 +96,7 @@ func (d *DistrictStore) CheckStrictMatch(cit string, dis string) (bool, error) {
 
 	return true, err
 }
-func (d *DistrictStore) fuzzyQuery(city string, dist string) ([]district.District, error) {
+func (d *DistrictStore) fuzzyQuery(city string, dist string) ([]District, error) {
 	var query string
 	cfg := getConfig()
 	levRatio := cfg.SearchConfig.LevRatio //Levenstein searching ratio from config
@@ -110,13 +115,13 @@ func (d *DistrictStore) fuzzyQuery(city string, dist string) ([]district.Distric
 	return result, err
 }
 
-func (d *DistrictStore) GetFuzzyMatch(input string) (district.District, error) {
+func (d *DistrictStore) GetFuzzyMatch(input string) (District, error) {
 
 	var city, dist string
 	var err error
 	s := strings.Split(input, " ")
 	if len(s) == 0 {
-		return district.District{}, err
+		return District{}, err
 	}
 	if len(s) == 1 {
 		city = ""
@@ -128,16 +133,16 @@ func (d *DistrictStore) GetFuzzyMatch(input string) (district.District, error) {
 	}
 	found, err := d.fuzzyQuery(city, dist)
 	if err != nil {
-		return district.District{}, err
+		return District{}, err
 	}
 
 	if len(found) < 1 {
 		found, err := d.fuzzyQuery(dist, city)
 		if err != nil {
-			return district.District{}, err
+			return District{}, err
 		}
 		if len(found) < 1 {
-			return district.District{
+			return District{
 				Name: "no matches",
 				City: "no matches",
 			}, err

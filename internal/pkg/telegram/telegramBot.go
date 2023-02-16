@@ -1,17 +1,74 @@
 package telegram
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"os"
+	"text/template"
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	district "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage/postgres"
 )
 
+type date struct {
+}
+
+func newDate() *date {
+	return &date{}
+}
+
+func (d *date) formatDate(t time.Time) string {
+	return t.Add(3 * time.Hour).String()[:19]
+}
+
+const badQuery = `
+I am sorry, but I can't find anythithg like _'{{.Text}}' _
+
+Maybe we should try again?
+Please print your city and neigbourhood divided by space, for example _'Fethie Taşyaka'_"
+`
+const listOutages = `
+{{if eq (len .) 0 }}
+*There is no outages planned in your neigborhood in the closest time*
+{{else}}
+*Here are the closest outages found for your neigborhood:*
+{{range .}}
+*{{.Resource}} outage* from {{format (.StartDate)}} to {{format (.EndDate)}}{{if gt (len .Notes ) 3 }}
+
+*In the next areas and streets:*
+{{.Notes}}{{end}}
+{{end}}
+{{end}}`
+const confirmDistr = `
+Did you mean _*{{.City}} {{.Name}}*_?`
+
+func buildAnswer(d district.District, o []outage.Outage) (string, error) {
+	var buffer bytes.Buffer
+	var err error
+	recallDistrTemp := template.Must(template.New("recallDistrTemp").Parse(confirmDistr))
+	if err := recallDistrTemp.Execute(&buffer, d); err != nil {
+		return "Error", err
+	}
+	date := newDate()
+	listOutagesTemp := template.New("listOutagesTemp").Funcs(template.FuncMap{
+		"format": date.formatDate,
+	})
+	listOutagesTemp, err = listOutagesTemp.Parse(listOutages)
+	if err != nil {
+		return "Error", err
+	}
+	if err := listOutagesTemp.Execute(&buffer, o); err != nil {
+		return "Error", err
+	}
+	return buffer.String(), err
+}
 func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore) {
+
+	var buffer bytes.Buffer
 	// подключаемся к боту с помощью токена
 	api := os.Getenv("OUTAGE_TELEGRAM_APITOKEN")
 	bot, err := tgbotapi.NewBotAPI(api)
@@ -34,34 +91,26 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore) {
 			} else {
 				guessDistr, err := ds.GetFuzzyMatch(update.Message.Text)
 				if err != nil {
-					fmt.Println("Fuzzy search error", err)
+					log.Fatal(err)
 				}
 				userOutages, err := store.GetActiveOutagesByCityDistrict(guessDistr.Name, guessDistr.City)
 				if err != nil {
-					fmt.Println("Outages search error", err)
+					log.Fatal(err)
 				}
 				if guessDistr.City == "no matches" {
-
-					msg.Text = "I am sorry, but I can't find anythithg like '" + update.Message.Text + "' Maybe we should try again?\n\n" + "Please print your city and neigbourhood divided by space, for example 'Fethie Taşyaka'"
+					badQueryTemp := template.Must(template.New("badQueryTemp").Parse(badQuery))
+					if err := badQueryTemp.Execute(&buffer, update.Message); err != nil {
+						log.Fatal(err)
+					}
+					msg.Text = buffer.String()
 				} else {
-					msg.Text = "Did you mean '" + guessDistr.City + " " + guessDistr.Name + "'?\n\n"
-					if len(userOutages) == 0 {
-						msg.Text += "There is no outages planned in your neigborhood in the closest time"
-					} else {
-						msg.Text += "**Here are the closest outages found for your neigborhood:**\n\n"
-						for _, i := range userOutages {
-							msg.Text += "**" + i.Resource + " outage** from " + i.StartDate.Add(3 * time.Hour).String()[:19] + " to " + i.EndDate.Add(3 * time.Hour).String()[:19] + "\n"
-							if len(i.Notes) > 3 {
-								msg.Text += "**In the next areas and streets:** " + i.Notes + "\n\n"
-							} else {
-								msg.Text += "\n"
-							}
-
-						}
+					msg.Text, err = buildAnswer(guessDistr, userOutages)
+					if err != nil {
+						log.Fatal(err)
 					}
 				}
 			}
-
+			msg.ParseMode = "MarkdownV2" //This parse mode enables format tags in TG
 			if _, err := bot.Send(msg); err != nil {
 				log.Panic(err)
 			}
