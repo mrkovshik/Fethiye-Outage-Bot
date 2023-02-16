@@ -15,17 +15,54 @@ import (
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage/postgres"
 )
 
-type date struct {
+type tool struct {
 }
 
-func newDate() *date {
-	return &date{}
+func newTool() *tool {
+	return &tool{}
 }
 
-func (d *date) formatDate(t time.Time) string {
+func (d *tool) formatDate(t time.Time) string {
 	return t.Add(3 * time.Hour).String()[:19]
 }
+func sanitize (s string) string{
+	myString := s
+myString = strings.ReplaceAll(myString, "\\", "")
+myString = strings.ReplaceAll(myString, "`", "")
+myString = strings.ReplaceAll(myString, "*", "")
+myString = strings.ReplaceAll(myString, "_", "")
+myString = strings.ReplaceAll(myString, "[", "")
+myString = strings.ReplaceAll(myString, "]", "")
+myString = strings.ReplaceAll(myString, "(", "")
+myString = strings.ReplaceAll(myString, ")", "")
+myString = strings.ReplaceAll(myString, "#", "")
+myString = strings.ReplaceAll(myString, "+", "")
+myString = strings.ReplaceAll(myString, "-", "")
+myString = strings.ReplaceAll(myString, ".", "")
+myString = strings.ReplaceAll(myString, "!", "")
+myString = strings.ReplaceAll(myString, "@", "")
+myString = strings.ReplaceAll(myString, ",", "")
+myString = strings.ReplaceAll(myString, "'", "")
+return myString
+ }
 
+ func (t *tool)escapeSimbols (s string) string{
+	myString := s
+myString = strings.ReplaceAll(myString, "\\", "\\\\")
+myString = strings.ReplaceAll(myString, "`", "\\`")
+myString = strings.ReplaceAll(myString, "*", "\\*")
+myString = strings.ReplaceAll(myString, "_", "\\_")
+myString = strings.ReplaceAll(myString, "[", "\\[")
+myString = strings.ReplaceAll(myString, "]", "\\]")
+myString = strings.ReplaceAll(myString, "(", "\\(")
+myString = strings.ReplaceAll(myString, ")", "\\)")
+myString = strings.ReplaceAll(myString, "#", "\\#")
+myString = strings.ReplaceAll(myString, "+", "\\+")
+myString = strings.ReplaceAll(myString, "-", "\\-")
+myString = strings.ReplaceAll(myString, ".", "\\.")
+myString = strings.ReplaceAll(myString, "!", "\\!")
+return myString
+ }
 const badQuery = `
 I am sorry, but I can't find anythithg like _'{{.Text}}' _
 
@@ -38,10 +75,10 @@ const listOutages = `
 {{else}}
 *Here are the closest outages found for your neigborhood:*
 {{range .}}
-*{{.Resource}} outage* from {{format (.StartDate)}} to {{format (.EndDate)}}{{if gt (len .Notes ) 3 }}
+*{{.Resource}} outage* from {{escape (format (.StartDate))}} to {{escape (format (.EndDate))}}{{if gt (len .Notes ) 3 }}
 
 *In the next areas and streets:*
-{{.Notes}}{{end}}
+{{escape (.Notes)}}{{end}}
 {{end}}
 {{end}}`
 const confirmDistr = `
@@ -50,13 +87,14 @@ Did you mean _*{{.City}} {{.Name}}*_?`
 func buildAnswer(d district.District, o []outage.Outage) (string, error) {
 	var buffer bytes.Buffer
 	var err error
-	recallDistrTemp := template.Must(template.New("recallDistrTemp").Parse(confirmDistr))
-	if err := recallDistrTemp.Execute(&buffer, d); err != nil {
+	confifmDistrTemp := template.Must(template.New("confifmDistrTemp").Parse(confirmDistr))
+	if err := confifmDistrTemp.Execute(&buffer, d); err != nil {
 		return "Error", err
 	}
-	date := newDate()
+	tool := newTool()
 	listOutagesTemp := template.New("listOutagesTemp").Funcs(template.FuncMap{
-		"format": date.formatDate,
+		"escape": tool.escapeSimbols,
+		"format": tool.formatDate,
 	})
 	listOutagesTemp, err = listOutagesTemp.Parse(listOutages)
 	if err != nil {
@@ -90,7 +128,8 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore) {
 			if update.Message.Text == "/start" {
 				msg.Text = "Please print your city and neigbourhood divided by space, for example 'Fethie Taşyaka'"
 			} else {
-				guessDistr, err := ds.GetFuzzyMatch(update.Message.Text)
+
+				guessDistr, err := ds.GetFuzzyMatch(sanitize(update.Message.Text))
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -111,9 +150,7 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore) {
 					}
 				}
 			}
-			msg.Text=strings.ReplaceAll(msg.Text, "-", "\\-")
-			msg.Text=strings.ReplaceAll(msg.Text, ".", "\\.")
-			msg.ParseMode = "MarkdownV2" //This parse mode enables format tags in TG
+						msg.ParseMode = "MarkdownV2" //This parse mode enables format tags in TG
 			if _, err := bot.Send(msg); err != nil {
 				log.Panic(err)
 			}
