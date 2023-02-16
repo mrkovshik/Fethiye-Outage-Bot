@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"text/template"
 	"time"
 
@@ -110,6 +111,8 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore) {
 					}
 				}
 			}
+			msg.Text=strings.ReplaceAll(msg.Text, "-", "\\-")
+			msg.Text=strings.ReplaceAll(msg.Text, ".", "\\.")
 			msg.ParseMode = "MarkdownV2" //This parse mode enables format tags in TG
 			if _, err := bot.Send(msg); err != nil {
 				log.Panic(err)
