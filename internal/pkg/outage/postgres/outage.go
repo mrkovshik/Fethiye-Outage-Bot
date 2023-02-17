@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"fmt"
+	"log"
 
 	"time"
 
@@ -193,9 +194,12 @@ func (os OutageStore) FetchOutages(cfg config.Config) {
 	}
 	f, err := os.FindNew(crawled)
 	if err != nil {
-		fmt.Println("Updating data error", err)
+		log.Fatal(err)
 	}
 	fmt.Println("Crawling completed")
-	os.Save(f)
+	err = os.Save(f)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }

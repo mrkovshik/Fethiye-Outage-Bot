@@ -34,14 +34,6 @@ func (d *districtRow) marshal() District {
 	}
 }
 
-func (d *districtRow) unmarshal(from District) error {
-	*d = districtRow{
-		City: from.City,
-		Name: from.Name,
-	}
-	return nil
-}
-
 func (su *districtRow) Columns() []string {
 	return []string{
 		"id", "city", "district",

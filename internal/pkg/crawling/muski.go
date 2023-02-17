@@ -4,6 +4,7 @@ import (
 	// "database/sql"
 	// "fmt"
 	"log"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -76,14 +77,27 @@ func (om OutageMuski) parseTable(table *goquery.Selection) []outage.Outage {
 
 func (om OutageMuski) Crawl() []outage.Outage {
 	//TODO add validation here
-	outages := make([]outage.Outage, 0)
-	doc, err := goquery.NewDocument(om.Url)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", om.Url, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		log.Fatal(resp.StatusCode)
+	}
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
 	table := doc.Find("table#plansiz")
 	rowSlice := om.parseTable(table)
 	rowSlice = om.expandDistr(rowSlice)
+	outages := []outage.Outage{}
 	outages = append(outages, rowSlice...)
 	return outages
 }
