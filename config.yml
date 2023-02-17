@@ -22,4 +22,4 @@ searchconfig:
   levratio: 4
 
 schedulerconfig:
-  fetch_period: '@every 30m'
+  fetch_period: '@every 3m'

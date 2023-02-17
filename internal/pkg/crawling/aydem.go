@@ -2,7 +2,7 @@ package crawling
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -84,7 +84,7 @@ func (oa OutageAydem) Crawl() []outage.Outage {
 		log.Fatal(err)
 	}
 	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
