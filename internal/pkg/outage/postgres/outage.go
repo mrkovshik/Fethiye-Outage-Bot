@@ -2,13 +2,14 @@ package postgres
 
 import (
 	"fmt"
+	"log"
 
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/crawling"
-	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
+	district "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
 	"github.com/pkg/errors"
 )
@@ -193,9 +194,12 @@ func (os OutageStore) FetchOutages(cfg config.Config) {
 	}
 	f, err := os.FindNew(crawled)
 	if err != nil {
-		fmt.Println("Updating data error", err)
+		log.Fatal(err)
 	}
 	fmt.Println("Crawling completed")
-	os.Save(f)
+	err = os.Save(f)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }

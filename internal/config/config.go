@@ -69,11 +69,11 @@ type Project struct {
 
 // Config - contains all configuration parameters in config package.
 type Config struct {
-	Project     Project     `yaml:"project"`
-	Database    Database    `yaml:"database"`
-	CrawlersURL CrawlersURL `yaml:"crawlersurl"`
-	SearchConfig	SearchConfig		`yaml:"searchconfig"`
-	SchedulerConfig	SchedulerConfig		`yaml:"schedulerconfig"`
+	Project         Project         `yaml:"project"`
+	Database        Database        `yaml:"database"`
+	CrawlersURL     CrawlersURL     `yaml:"crawlersurl"`
+	SearchConfig    SearchConfig    `yaml:"searchconfig"`
+	SchedulerConfig SchedulerConfig `yaml:"schedulerconfig"`
 }
 
 // ReadConfigYML - read configurations from file and init instance Config.
