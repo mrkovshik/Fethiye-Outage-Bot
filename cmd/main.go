@@ -19,8 +19,6 @@ import (
 	"github.com/pressly/goose/v3"
 )
 
-var err error
-
 func main() {
 	// Open the configuration file
 	configFile, err := os.Open("logger_config.json")
@@ -40,7 +38,11 @@ func main() {
     if err != nil {
         panic(err)
     }
-	defer logger.Sync()
+	defer func() {
+        if err := logger.Sync(); err != nil {
+            logger.Sugar().Fatal("error syncing log output: %s", err)
+        }
+    }()
 
 	//reading config file
 	cfg := config.GetConfig()
