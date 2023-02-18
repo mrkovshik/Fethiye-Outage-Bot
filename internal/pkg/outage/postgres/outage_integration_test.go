@@ -73,8 +73,7 @@ func TestOutageStore_Get(t *testing.T) {
 
 	for _, tt := range getTests {
 		t.Run(tt.name, func(t *testing.T) {
-			outages := []outage.Outage{}
-			outages, _ = testStore.GetActiveOutagesByCityDistrict(tt.district, tt.city)
+			outages, _ := testStore.GetActiveOutagesByCityDistrict(tt.district, tt.city)
 			if len(outages) != tt.wantedQnty {
 				t.Errorf("want %v, get %v", tt.wantedQnty, len(outages))
 			}
@@ -143,8 +142,10 @@ func TestOutageStore_Validate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			outages := []outage.Outage{}
-			outages, err = testStore.ValidateDistricts(tt.outages)
+			outages, err:= testStore.ValidateDistricts(tt.outages)
+			if err != nil {
+				log.Fatal(err)
+			}
 			if len(outages) != len(tt.want) {
 				t.Errorf("want %v, get %v", tt.want, outages)
 			}

@@ -2,9 +2,7 @@ package district
 
 import (
 	"fmt"
-	"log"
 	"strings"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
 
@@ -12,14 +10,6 @@ import (
 type District struct {
 	Name string
 	City string
-}
-
-
-func getConfig() config.Config {
-	if err := config.ReadConfigYML("config.yml"); err != nil {
-		log.Fatalf("Failed init configuration %v", err)
-	}
-	return config.GetConfigInstance()
 }
 
 type districtRow struct {
@@ -90,7 +80,7 @@ func (d *DistrictStore) CheckStrictMatch(cit string, dis string) (bool, error) {
 }
 func (d *DistrictStore) fuzzyQuery(city string, dist string) ([]District, error) {
 	var query string
-	cfg := getConfig()
+	cfg := config.GetConfig()
 	levRatio := cfg.SearchConfig.LevRatio //Levenstein searching ratio from config
 	simRatio := cfg.SearchConfig.SimRatio //Similarity searching ratio from config
 	if city == "" {

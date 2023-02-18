@@ -52,7 +52,7 @@ func (om OutageMuski) parseTable(table *goquery.Selection) []outage.Outage {
 					parsedRow.District = cell.Text()
 
 				case j == 4:
-					parsedDur, err := strconv.ParseInt(strings.Trim(cell.Text(), " Saat"), 0, 64)
+					parsedDur, err := strconv.ParseInt(strings.TrimSuffix(cell.Text(), " Saat"), 0, 64)
 					if err != nil {
 						log.Fatal(err)
 					}

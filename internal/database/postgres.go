@@ -17,7 +17,7 @@ func ConnectDB(cfg config.Config) *sqlx.DB {
 		cfg.Database.Name,
 		cfg.Database.SslMode,
 	)
-	log.Printf(dsn)
+	log.Printf("%v",dsn)
 	db, err := NewPostgres(dsn, cfg.Database.Driver)
 	if err != nil {
 		log.Fatal("Failed init postgres")
