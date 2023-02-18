@@ -45,12 +45,12 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore) {
 	var err error
 	tool := newTool()
 	//mapping the functions for templates
-	dialogTemplape := template.New("dialogTemplape").Funcs(template.FuncMap{
+	dialogTemplate := template.New("dialogTemplate").Funcs(template.FuncMap{
 		"escape": tool.escapeSimbols,
 		"format": tool.formatDateAndMakeLocal,
 	})
 	//parsing the template file
-	t, err := dialogTemplape.ParseFiles("dialog_templates.tpl")
+	t, err := dialogTemplate.ParseFiles("./templates/dialog_templates_eng.tpl")
 	if err != nil {
 		log.Fatal(err)
 	}
