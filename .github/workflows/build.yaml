@@ -97,6 +97,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Add release date
+        run:  sed -i "11a \"release_date\": \"$(date +%Y-%m-%d\ %H:%M:%S)\"" logger_config.json
+
       - name: Copy config file
         uses: appleboy/scp-action@master
         with:
