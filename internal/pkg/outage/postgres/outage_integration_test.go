@@ -1,7 +1,9 @@
 package postgres
 
 import (
+	"encoding/json"
 	"log"
+	"os"
 	"testing"
 	"time"
 
@@ -10,17 +12,37 @@ import (
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/database"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
+	"go.uber.org/zap"
 	"gotest.tools/assert"
 )
 
 func TestOutageStore_Save(t *testing.T) {
-	var err error
+	// Open the configuration file
+	configFile, err := os.Open("../../../../logger_config.json")
+	if err != nil {
+		panic(err)
+	}
+	defer configFile.Close()
+
+	// Decode the configuration file into a zap.Config struct
+	var logCfg zap.Config
+	if err := json.NewDecoder(configFile).Decode(&logCfg); err != nil {
+		panic(err)
+	}
+
+	// Create a logger from the configuration
+	logger, err := logCfg.Build()
+	if err != nil {
+		panic(err)
+	}
+	//nolint:errcheck
+	defer logger.Sync()
 	// use local database, TODO mock
 	if err := config.ReadConfigYML("../../../../config.yml"); err != nil {
 		log.Fatal("Failed init configuration")
 	}
 	cfg := config.GetConfigInstance()
-	db := database.ConnectDB(cfg)
+	db := database.ConnectDB(cfg, logger)
 	defer db.Close()
 	// TODO initialise out of test scope
 	testStore := NewOutageStore(db)
@@ -51,12 +73,31 @@ func TestOutageStore_Save(t *testing.T) {
 }
 
 func TestOutageStore_Get(t *testing.T) {
+	// Open the configuration file
+	configFile, err := os.Open("../../../../logger_config.json")
+	if err != nil {
+		panic(err)
+	}
+	defer configFile.Close()
 
+	// Decode the configuration file into a zap.Config struct
+	var logCfg zap.Config
+	if err := json.NewDecoder(configFile).Decode(&logCfg); err != nil {
+		panic(err)
+	}
+
+	// Create a logger from the configuration
+	logger, err := logCfg.Build()
+	if err != nil {
+		panic(err)
+	}
+	//nolint:errcheck
+	defer logger.Sync()
 	if err := config.ReadConfigYML("../../../../config.yml"); err != nil {
 		log.Fatal("Failed init configuration")
 	}
 	cfg := config.GetConfigInstance()
-	db := database.ConnectDB(cfg)
+	db := database.ConnectDB(cfg, logger)
 	defer db.Close()
 	testStore := NewOutageStore(db)
 	var getTests = []struct {
@@ -84,6 +125,25 @@ func TestOutageStore_Get(t *testing.T) {
 }
 
 func TestOutageStore_Validate(t *testing.T) {
+	configFile, err := os.Open("../../../../logger_config.json")
+	if err != nil {
+		panic(err)
+	}
+	defer configFile.Close()
+
+	// Decode the configuration file into a zap.Config struct
+	var logCfg zap.Config
+	if err := json.NewDecoder(configFile).Decode(&logCfg); err != nil {
+		panic(err)
+	}
+
+	// Create a logger from the configuration
+	logger, err := logCfg.Build()
+	if err != nil {
+		panic(err)
+	}
+	//nolint:errcheck
+	defer logger.Sync()
 	var StartDate = time.Now()
 	var tests = []struct {
 		name    string
@@ -131,18 +191,16 @@ func TestOutageStore_Validate(t *testing.T) {
 				SourceURL: "test entry",
 			}},
 		}}
-	var err error
 	if err = config.ReadConfigYML("../../../../config.yml"); err != nil {
 		log.Fatal("Failed init configuration")
 	}
 	cfg := config.GetConfigInstance()
-	db := database.ConnectDB(cfg)
+	db := database.ConnectDB(cfg, logger)
 	defer db.Close()
 	testStore := NewOutageStore(db)
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			outages, err:= testStore.ValidateDistricts(tt.outages)
+			outages, err := testStore.ValidateDistricts(tt.outages)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -155,10 +213,7 @@ func TestOutageStore_Validate(t *testing.T) {
 						t.Errorf("want %v, get %v", tt.want[i], outages[i])
 					}
 				}
-
 			}
-
 		})
 	}
-
 }

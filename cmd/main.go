@@ -33,20 +33,18 @@ func main() {
 		panic(err)
 	}
 
-    // Create a logger from the configuration
-    logger, err := logCfg.Build()
-    if err != nil {
-        panic(err)
-    }
-	defer func() {
-        if err := logger.Sync(); err != nil {
-            logger.Sugar().Fatal("error syncing log output: %s", err)
-        }
-    }()
+	// Create a logger from the configuration
+	logger, err := logCfg.Build()
+	if err != nil {
+		panic(err)
+	}
+
+	//nolint:errcheck
+	defer logger.Sync()
 
 	//reading config file
 	cfg := config.GetConfig()
-	db := database.ConnectDB(cfg)
+	db := database.ConnectDB(cfg, logger)
 	defer db.Close()
 	migration := flag.Bool("migration", true, "Defines the migration start option")
 	flag.Parse()
