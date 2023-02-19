@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"fmt"
-	"log"
 
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	district "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 type outageRow struct {
@@ -94,7 +94,7 @@ func (os *OutageStore) Save(o []outage.Outage) error {
 func (os *OutageStore) Read(query string) ([]outage.Outage, error) {
 	rows, err := os.db.Query(query)
 	if err != nil {
-		fmt.Println("Failed to query database:", err)
+		err = errors.Wrap(err, "Failed to query database:")
 		return []outage.Outage{}, err
 	}
 	defer rows.Close()
@@ -103,16 +103,15 @@ func (os *OutageStore) Read(query string) ([]outage.Outage, error) {
 	for rows.Next() {
 		var o = outageRow{}
 		if err := rows.Scan(&o.Resource, &o.City, &o.District, &o.StartDate, &o.EndDate, &o.SourceURL, &o.Notes); err != nil {
-			fmt.Println("Failed to scan row:", err)
+			err = errors.Wrap(err, "Failed to scan row:")
 			return []outage.Outage{}, err
 		}
 		qryRes = append(qryRes, o.marshal())
 	}
 	if err := rows.Err(); err != nil {
-		fmt.Println("Error iterating through rows:", err)
+		err = errors.Wrap(err, "Error iterating through rows:")
 		return []outage.Outage{}, err
 	}
-
 	return qryRes, err
 }
 
@@ -135,7 +134,7 @@ func (os *OutageStore) ValidateDistricts(crawled []outage.Outage) ([]outage.Outa
 	for _, i := range crawled {
 		ok, err := ds.CheckStrictMatch(i.City, i.District)
 		if err != nil {
-			fmt.Println("Failed to validate:", err)
+			err = errors.Wrap(err, "Failed to validate:")
 			return []outage.Outage{}, err
 		}
 		if !ok {
@@ -149,10 +148,9 @@ func (os *OutageStore) FindNew(crawled []outage.Outage) ([]outage.Outage, error)
 	result := make([]outage.Outage, 0)
 	readed, err := os.GetActiveOutagesByCityDistrict("", "")
 	if err != nil {
-		fmt.Println("Failed to query database:", err)
+		err = errors.Wrap(err, "Failed to query database:")
 		return []outage.Outage{}, err
 	}
-
 	if len(readed) == 0 {
 		return crawled, err
 	}
@@ -165,12 +163,11 @@ func (os *OutageStore) FindNew(crawled []outage.Outage) ([]outage.Outage, error)
 				result = append(result, i)
 			}
 		}
-
 	}
 	return result, err
 }
 
-func (os OutageStore) FetchOutages(cfg config.Config) {
+func (o OutageStore) FetchOutages(cfg config.Config, logger *zap.Logger) {
 	muskiURL := cfg.CrawlersURL.Muski
 	aydemURL := cfg.CrawlersURL.Aydem
 	var Aydem = crawling.OutageAydem{
@@ -186,20 +183,31 @@ func (os OutageStore) FetchOutages(cfg config.Config) {
 		Aydem,
 		Muski,
 	}
-
-	fmt.Println("Crawling started")
+	logger.Debug("Crawling started")
 	crawled := make([]outage.Outage, 0)
 	for _, crw := range crawlers {
 		crawled = append(crawled, crawling.CrawlOutages(crw)...)
 	}
-	f, err := os.FindNew(crawled)
+	invalidDistr, err := o.ValidateDistricts(crawled)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal("",
+			zap.Error(err))
 	}
-	fmt.Println("Crawling completed")
-	err = os.Save(f)
+	if invalidDistr != nil {
+		logger.Warn("Attempt to add folowing invalid Districts to DB",
+			zap.Any("Invalid districts", invalidDistr),
+		)
+	}
+	f, err := o.FindNew(crawled)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal("",
+			zap.Error(err))
+	}
+	logger.Debug("Crawling started")
+	err = o.Save(f)
+	if err != nil {
+		logger.Fatal("",
+			zap.Error(err))
 	}
 
 }

@@ -3,23 +3,49 @@
 package district
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"testing"
 
 	_ "github.com/jackc/pgx/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/database"
+	"go.uber.org/zap"
 )
 
 func TestDistrictStore_StrictMatch(t *testing.T) {
 	// use local database, TODO mock
+	// Open the configuration file
+	configFile, err := os.Open("logger_config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer configFile.Close()
+
+	// Decode the configuration file into a zap.Config struct
+	var logCfg zap.Config
+	if err := json.NewDecoder(configFile).Decode(&logCfg); err != nil {
+		log.Fatal(err)
+	}
+
+	// Create a logger from the configuration
+	logger, err := logCfg.Build()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//nolint:errcheck
+	defer logger.Sync()
+
 	if err := config.ReadConfigYML("../../../../config.yml"); err != nil {
-		log.Fatal("Failed init configuration")
+		logger.Fatal("Failed init configuration",
+			zap.Error(err),
+		)
 	}
 	cfg := config.GetConfigInstance()
-
 	dsn := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=%v",
 		cfg.Database.Host,
 		cfg.Database.Port,
@@ -28,11 +54,14 @@ func TestDistrictStore_StrictMatch(t *testing.T) {
 		cfg.Database.Name,
 		cfg.Database.SslMode,
 	)
-	log.Printf(dsn)
-
+	logger.Info("dsn: ",
+		zap.String("", dsn),
+	)
 	db, err := database.NewPostgres(dsn, cfg.Database.Driver)
 	if err != nil {
-		log.Fatal("Failed init postgres")
+		logger.Fatal("Failed init postgres",
+			zap.Error(err),
+		)
 	}
 	defer db.Close()
 	// TODO initialise out of test scope
@@ -62,11 +91,34 @@ func TestDistrictStore_StrictMatch(t *testing.T) {
 }
 func TestDistrictStore_FuzzyMatch(t *testing.T) {
 	// use local database, TODO mock
+	// Open the configuration file
+	configFile, err := os.Open("logger_config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer configFile.Close()
+
+	// Decode the configuration file into a zap.Config struct
+	var logCfg zap.Config
+	if err := json.NewDecoder(configFile).Decode(&logCfg); err != nil {
+		log.Fatal(err)
+	}
+
+	// Create a logger from the configuration
+	logger, err := logCfg.Build()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//nolint:errcheck
+	defer logger.Sync()
+
 	if err := config.ReadConfigYML("../../../../config.yml"); err != nil {
-		log.Fatal("Failed init configuration")
+		logger.Fatal("Failed init configuration",
+			zap.Error(err),
+		)
 	}
 	cfg := config.GetConfigInstance()
-
 	dsn := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=%v",
 		cfg.Database.Host,
 		cfg.Database.Port,
@@ -75,11 +127,14 @@ func TestDistrictStore_FuzzyMatch(t *testing.T) {
 		cfg.Database.Name,
 		cfg.Database.SslMode,
 	)
-	log.Printf(dsn)
-
+	logger.Info("dsn: ",
+		zap.String("", dsn),
+	)
 	db, err := database.NewPostgres(dsn, cfg.Database.Driver)
 	if err != nil {
-		log.Fatal("Failed init postgres")
+		logger.Fatal("Failed init postgres",
+			zap.Error(err),
+		)
 	}
 	defer db.Close()
 	// TODO initialise out of test scope

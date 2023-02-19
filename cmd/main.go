@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"log"
 	"os"
 
 	_ "github.com/jackc/pgx/v4"
@@ -43,24 +42,32 @@ func main() {
 	defer logger.Sync()
 
 	//reading config file
-	cfg := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		logger.Error("",
+			zap.Error(err),
+		)
+	}
 	db := database.ConnectDB(cfg, logger)
 	defer db.Close()
 	migration := flag.Bool("migration", true, "Defines the migration start option")
 	flag.Parse()
 	if *migration {
 		if err = goose.Up(db.DB, cfg.Database.Migrations); err != nil {
-			log.Fatalf("Migration failed, %v", err)
-			return
+			logger.Fatal("Migration failed",
+				zap.Error(err),
+			)
 		}
 	}
 	c := cron.New()
 	store := postgres.NewOutageStore(db)
 	ds := district.NewDistrictStore(db)
-	err = c.AddFunc(cfg.SchedulerConfig.FetchPeriod, func() { store.FetchOutages(cfg) })
+	err = c.AddFunc(cfg.SchedulerConfig.FetchPeriod, func() { store.FetchOutages(cfg, logger) })
 	c.Start()
 	if err != nil {
-		log.Fatalf("Sceduler error %v", err)
+		logger.Fatal("Sceduler error",
+			zap.Error(err),
+		)
 	}
-	telegram.BotRunner(ds, store)
+	telegram.BotRunner(ds, store, logger)
 }

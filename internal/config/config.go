@@ -1,10 +1,10 @@
 package config
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 
+	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 )
 
@@ -16,11 +16,12 @@ const (
 
 var cfg *Config
 
-func GetConfig() Config {
+func GetConfig() (Config, error) {
 	if err := ReadConfigYML("config.yml"); err != nil {
-		log.Fatalf("Failed init configuration %v", err)
+		err = errors.Wrap(err, "Failed init configuration")
+		return Config{}, err
 	}
-	return GetConfigInstance()
+	return GetConfigInstance(), nil
 }
 
 // GetConfigInstance returns service config
@@ -28,7 +29,6 @@ func GetConfigInstance() Config {
 	if cfg != nil {
 		return *cfg
 	}
-
 	return Config{}
 }
 
@@ -81,9 +81,9 @@ func ReadConfigYML(filePath string) error {
 	if cfg != nil {
 		return nil
 	}
-
 	file, err := os.Open(filepath.Clean(filePath))
 	if err != nil {
+		err = errors.Wrap(err, "Error opening config file")
 		return err
 	}
 	defer func() {
@@ -92,6 +92,7 @@ func ReadConfigYML(filePath string) error {
 
 	decoder := yaml.NewDecoder(file)
 	if err := decoder.Decode(&cfg); err != nil {
+		err = errors.Wrap(err, "Error decoding config file")
 		return err
 	}
 
