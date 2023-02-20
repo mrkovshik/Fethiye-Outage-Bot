@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 )
 
@@ -63,7 +64,7 @@ type Project struct {
 	Debug       bool   `yaml:"debug"`
 	Name        string `yaml:"name"`
 	Environment string `yaml:"environment"`
-	Version     string
+	Version     string `yaml:"version"`
 	CommitHash  string
 }
 
@@ -74,6 +75,7 @@ type Config struct {
 	CrawlersURL     CrawlersURL     `yaml:"crawlersurl"`
 	SearchConfig    SearchConfig    `yaml:"searchconfig"`
 	SchedulerConfig SchedulerConfig `yaml:"schedulerconfig"`
+	LoggerConfig    zap.Config      `yaml:"loggerconfig"`
 }
 
 // ReadConfigYML - read configurations from file and init instance Config.
@@ -96,7 +98,6 @@ func ReadConfigYML(filePath string) error {
 		return err
 	}
 
-	cfg.Project.Version = version
 	cfg.Project.CommitHash = commitHash
 
 	return nil

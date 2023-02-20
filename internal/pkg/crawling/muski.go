@@ -11,6 +11,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
+	"github.com/pkg/errors"
 )
 
 type OutageMuski struct {
@@ -50,7 +51,6 @@ func (om OutageMuski) parseTable(table *goquery.Selection) []outage.Outage {
 					parsedRow.City = cell.Text()
 				case j == 3:
 					parsedRow.District = cell.Text()
-
 				case j == 4:
 					parsedDur, err := strconv.ParseInt(strings.TrimSuffix(cell.Text(), " Saat"), 0, 64)
 					if err != nil {
@@ -75,29 +75,33 @@ func (om OutageMuski) parseTable(table *goquery.Selection) []outage.Outage {
 	return rowSlice
 }
 
-func (om OutageMuski) Crawl() []outage.Outage {
+func (om OutageMuski) Crawl() ([]outage.Outage, error) {
 	//TODO add validation here
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", om.Url, nil)
 	if err != nil {
-		log.Fatal(err)
+		errors.Wrap(err, "Error wrapping request for Muski URL")
+		return []outage.Outage{}, err
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		errors.Wrap(err, "Error requesting Muski URL")
+		return []outage.Outage{}, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		log.Fatal(resp.StatusCode)
+		errors.Wrap(err, "Response from Muski is not OK")
+		return []outage.Outage{}, err
 	}
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		errors.Wrap(err, "Error reading Muski response")
+		return []outage.Outage{}, err
 	}
 	table := doc.Find("table#plansiz")
 	rowSlice := om.parseTable(table)
 	rowSlice = om.expandDistr(rowSlice)
 	outages := []outage.Outage{}
 	outages = append(outages, rowSlice...)
-	return outages
+	return outages, err
 }

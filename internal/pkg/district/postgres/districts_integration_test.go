@@ -3,11 +3,11 @@
 package district
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 	"testing"
+
+	"github.com/pkg/errors"
 
 	_ "github.com/jackc/pgx/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -18,34 +18,19 @@ import (
 
 func TestDistrictStore_StrictMatch(t *testing.T) {
 	// use local database, TODO mock
-	// Open the configuration file
-	configFile, err := os.Open("logger_config.json")
-	if err != nil {
+	if err := config.ReadConfigYML("../../../../config.yml"); err != nil {
+		errors.Wrap(err, "Failed init configuration")
 		log.Fatal(err)
 	}
-	defer configFile.Close()
-
-	// Decode the configuration file into a zap.Config struct
-	var logCfg zap.Config
-	if err := json.NewDecoder(configFile).Decode(&logCfg); err != nil {
-		log.Fatal(err)
-	}
-
+	cfg := config.GetConfigInstance()
 	// Create a logger from the configuration
-	logger, err := logCfg.Build()
+	logger, err := cfg.LoggerConfig.Build()
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	//nolint:errcheck
 	defer logger.Sync()
 
-	if err := config.ReadConfigYML("../../../../config.yml"); err != nil {
-		logger.Fatal("Failed init configuration",
-			zap.Error(err),
-		)
-	}
-	cfg := config.GetConfigInstance()
 	dsn := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=%v",
 		cfg.Database.Host,
 		cfg.Database.Port,
@@ -91,34 +76,19 @@ func TestDistrictStore_StrictMatch(t *testing.T) {
 }
 func TestDistrictStore_FuzzyMatch(t *testing.T) {
 	// use local database, TODO mock
-	// Open the configuration file
-	configFile, err := os.Open("logger_config.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer configFile.Close()
-
-	// Decode the configuration file into a zap.Config struct
-	var logCfg zap.Config
-	if err := json.NewDecoder(configFile).Decode(&logCfg); err != nil {
-		log.Fatal(err)
-	}
-
-	// Create a logger from the configuration
-	logger, err := logCfg.Build()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	//nolint:errcheck
-	defer logger.Sync()
-
 	if err := config.ReadConfigYML("../../../../config.yml"); err != nil {
-		logger.Fatal("Failed init configuration",
-			zap.Error(err),
-		)
+		errors.Wrap(err, "Failed init configuration")
+		log.Fatal(err)
 	}
 	cfg := config.GetConfigInstance()
+	// Create a logger from the configuration
+	logger, err := cfg.LoggerConfig.Build()
+	if err != nil {
+		log.Fatal(err)
+	}
+	//nolint:errcheck
+	defer logger.Sync()
+	
 	dsn := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=%v",
 		cfg.Database.Host,
 		cfg.Database.Port,

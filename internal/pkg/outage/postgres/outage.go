@@ -186,12 +186,15 @@ func (o OutageStore) FetchOutages(cfg config.Config, logger *zap.Logger) {
 	logger.Debug("Crawling started")
 	crawled := make([]outage.Outage, 0)
 	for _, crw := range crawlers {
-		crawled = append(crawled, crawling.CrawlOutages(crw)...)
+		res, err := crawling.CrawlOutages(crw)
+		if err != nil {
+			logger.Sugar().Fatal(err)
+		}
+		crawled = append(crawled, res...)
 	}
 	invalidDistr, err := o.ValidateDistricts(crawled)
 	if err != nil {
-		logger.Fatal("",
-			zap.Error(err))
+		logger.Sugar().Fatal(err)
 	}
 	if invalidDistr != nil {
 		logger.Warn("Attempt to add folowing invalid Districts to DB",
@@ -200,14 +203,12 @@ func (o OutageStore) FetchOutages(cfg config.Config, logger *zap.Logger) {
 	}
 	f, err := o.FindNew(crawled)
 	if err != nil {
-		logger.Fatal("",
-			zap.Error(err))
+		logger.Sugar().Fatal(err)
 	}
 	logger.Debug("Crawling started")
 	err = o.Save(f)
 	if err != nil {
-		logger.Fatal("",
-			zap.Error(err))
+		logger.Sugar().Fatal(err)
 	}
 
 }

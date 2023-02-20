@@ -1,53 +1,36 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
-	"os"
 
 	_ "github.com/jackc/pgx/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/database"
 	district "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
-	"github.com/robfig/cron"
-	"go.uber.org/zap"
-
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage/postgres"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/telegram"
 	"github.com/pressly/goose/v3"
+	"github.com/robfig/cron"
+	"go.uber.org/zap"
 )
 
 func main() {
-	// Open the configuration file
-	configFile, err := os.Open("logger_config.json")
-	if err != nil {
-		panic(err)
-	}
-	defer configFile.Close()
-
-	// Decode the configuration file into a zap.Config struct
-	var logCfg zap.Config
-	if err := json.NewDecoder(configFile).Decode(&logCfg); err != nil {
-		panic(err)
-	}
-
-	// Create a logger from the configuration
-	logger, err := logCfg.Build()
-	if err != nil {
-		panic(err)
-	}
-
-	//nolint:errcheck
-	defer logger.Sync()
-
 	//reading config file
 	cfg, err := config.GetConfig()
 	if err != nil {
-		logger.Error("",
-			zap.Error(err),
-		)
+		panic(err)
 	}
+	// Create a logger from the configuration
+	logger, err := cfg.LoggerConfig.Build()
+	if err != nil {
+		panic(err)
+	}
+	//nolint:errcheck
+	defer logger.Sync()
+
+	logger.Info("App started",
+		zap.Any("Version", cfg.Project.Version))
 	db := database.ConnectDB(cfg, logger)
 	defer db.Close()
 	migration := flag.Bool("migration", true, "Defines the migration start option")

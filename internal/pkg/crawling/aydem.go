@@ -3,12 +3,12 @@ package crawling
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
+	"github.com/pkg/errors"
 )
 
 type OutageAydem struct {
@@ -48,19 +48,22 @@ func (oa OutageAydem) MergeStreets(o []outage.Outage) []outage.Outage {
 	return res
 }
 
-func (oa OutageAydem) ConvertToOutage(ad []AydemData) []outage.Outage {
+func (oa OutageAydem) ConvertToOutage(ad []AydemData) ([]outage.Outage, error) {
+	var err error
 	res := make([]outage.Outage, 0)
 	for _, i := range ad {
 		if i.Area == "MUĞLA" {
 			parsedEndDate, err := time.Parse(aydemTimeFormat, i.OutageEndDate[:16])
 			if err != nil {
-				log.Fatal(err)
+				errors.Wrap(err, "OutageEndDate parsing error")
+				return []outage.Outage{}, err
 			}
 			parsedEndDate = parsedEndDate.Add(-3 * time.Hour)
 			if parsedEndDate.After(time.Now().UTC()) {
 				parsedStartDate, err := time.Parse(aydemTimeFormat, i.OutageStartDate[:16])
 				if err != nil {
-					log.Fatal(err)
+					errors.Wrap(err, "OutageStartDate parsing error")
+					return []outage.Outage{}, err
 				}
 				parsedStartDate = parsedStartDate.Add(-3 * time.Hour)
 				o := outage.Outage{}
@@ -75,24 +78,30 @@ func (oa OutageAydem) ConvertToOutage(ad []AydemData) []outage.Outage {
 			}
 		}
 	}
-	return res
+	return res, err
 }
 
-func (oa OutageAydem) Crawl() []outage.Outage {
+func (oa OutageAydem) Crawl() ([]outage.Outage, error) {
 	response, err := http.Get(oa.Url)
 	if err != nil {
-		log.Fatal(err)
+		errors.Wrap(err, "Error querying Aydem URL")
+		return []outage.Outage{}, err
 	}
 	defer response.Body.Close()
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Fatal(err)
+		errors.Wrap(err, "Error reading response from Aydem")
+		return []outage.Outage{}, err
 	}
 	var outages []AydemData
 	err = json.Unmarshal(body, &outages)
 	if err != nil {
-		log.Fatal(err)
+		errors.Wrap(err, "Error Unmarshalling json from Aydem")
+		return []outage.Outage{}, err
 	}
-	res := oa.ConvertToOutage(outages)
-	return oa.MergeStreets(res)
+	res, err := oa.ConvertToOutage(outages)
+	if err != nil {
+		return []outage.Outage{}, err
+	}
+	return oa.MergeStreets(res), err
 }
