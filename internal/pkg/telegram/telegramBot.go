@@ -25,20 +25,20 @@ func (t *tool) formatDateAndMakeLocal(tm time.Time) string {
 	return tm.Add(3 * time.Hour).String()[:19]
 }
 
-func (t *tool) sanitize(s string) string {
-	re, err := regexp.Compile(`[^\w]`)
+func (t *tool) sanitize(s string) []string {
+	re, err := regexp.Compile(`[\p{L}\d_]+`)
 	if err != nil {
 		log.Fatal(err)
 	}
-	s = re.ReplaceAllString(s, " ")
-	return s
+	res := re.FindAllString(s, -1)
+	return res
 }
 
 func (t *tool) escapeSimbols(s string) string {
 	re := regexp.MustCompile(`[\\` + "`*_\\[\\]()#+\\-.!]")
-    return re.ReplaceAllStringFunc(s, func(match string) string {
-        return "\\" + match
-    })
+	return re.ReplaceAllStringFunc(s, func(match string) string {
+		return "\\" + match
+	})
 }
 
 func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore) {
@@ -74,24 +74,31 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore) {
 					log.Fatal(err)
 				}
 			} else {
-				guessDistr, err := ds.GetFuzzyMatch(tool.sanitize(update.Message.Text))
-				if err != nil {
-					log.Fatal(err)
-				}
-				userOutages, err := store.GetActiveOutagesByCityDistrict(guessDistr.Name, guessDistr.City)
-				if err != nil {
-					log.Fatal(err)
-				}
-				if guessDistr.City == "no matches" {
+				words := tool.sanitize(update.Message.Text)
+				if len(words) == 0 {
 					if err := t.ExecuteTemplate(&buffer, "badQuery", update.Message); err != nil {
 						log.Fatal(err)
 					}
 				} else {
-					if err := t.ExecuteTemplate(&buffer, "confirmDistr", guessDistr); err != nil {
+					guessDistr, err := ds.GetFuzzyMatch(words)
+					if err != nil {
 						log.Fatal(err)
 					}
-					if err := t.ExecuteTemplate(&buffer, "listOutages", userOutages); err != nil {
+					userOutages, err := store.GetActiveOutagesByCityDistrict(guessDistr.Name, guessDistr.City)
+					if err != nil {
 						log.Fatal(err)
+					}
+					if guessDistr.City == "no matches" {
+						if err := t.ExecuteTemplate(&buffer, "badQuery", update.Message); err != nil {
+							log.Fatal(err)
+						}
+					} else {
+						if err := t.ExecuteTemplate(&buffer, "confirmDistr", guessDistr); err != nil {
+							log.Fatal(err)
+						}
+						if err := t.ExecuteTemplate(&buffer, "listOutages", userOutages); err != nil {
+							log.Fatal(err)
+						}
 					}
 				}
 			}

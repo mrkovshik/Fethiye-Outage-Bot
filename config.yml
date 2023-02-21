@@ -19,7 +19,7 @@ crawlersurl:
 
 searchconfig:
   simratio: 0.4
-  levratio: 4
+  levratio: 3
 
 schedulerconfig:
   fetch_period: '@every 30m'
