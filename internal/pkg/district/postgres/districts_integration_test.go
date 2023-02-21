@@ -88,7 +88,7 @@ func TestDistrictStore_FuzzyMatch(t *testing.T) {
 	}
 	//nolint:errcheck
 	defer logger.Sync()
-	
+
 	dsn := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=%v",
 		cfg.Database.Host,
 		cfg.Database.Port,

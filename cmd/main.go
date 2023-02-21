@@ -46,12 +46,11 @@ func main() {
 	store := postgres.NewOutageStore(db)
 	ds := district.NewDistrictStore(db)
 	err = c.AddFunc(cfg.SchedulerConfig.FetchPeriod, func() { store.FetchOutages(cfg, logger) })
-	c.Start()
 	if err != nil {
 		logger.Fatal("Sceduler error",
 			zap.Error(err),
 		)
 	}
-	store.FetchOutages(cfg, logger)
+	c.Start()
 	telegram.BotRunner(ds, store, logger)
 }
