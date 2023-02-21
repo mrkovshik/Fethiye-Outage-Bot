@@ -3,7 +3,7 @@ package crawling
 import (
 	// "database/sql"
 	// "fmt"
-	"log"
+
 	"net/http"
 	"strconv"
 	"strings"
@@ -37,42 +37,47 @@ func (om OutageMuski) expandDistr(s []outage.Outage) []outage.Outage {
 	return s
 }
 
-func (om OutageMuski) parseTable(table *goquery.Selection) []outage.Outage {
-	rowSlice := make([]outage.Outage, 0)
-	table.Find("tr").Each(func(i int, row *goquery.Selection) {
-		if i > 2 {
-			parsedRow := outage.Outage{}
-			row.Find("td").Each(func(j int, cell *goquery.Selection) {
-				parsedRow.Notes = ""
-				parsedRow.Resource = om.Resource
-				parsedRow.SourceURL = om.Url
-				switch {
-				case j == 2:
-					parsedRow.City = cell.Text()
-				case j == 3:
-					parsedRow.District = cell.Text()
-				case j == 4:
-					parsedDur, err := strconv.ParseInt(strings.TrimSuffix(cell.Text(), " Saat"), 0, 64)
-					if err != nil {
-						log.Fatal(err)
-					}
-					parsedRow.Duration = time.Duration(parsedDur) * time.Hour
-				case j == 5:
-					parsedTime, err := time.Parse(oldTimeFormat, strings.Trim(cell.Text(), " "))
-					parsedRow.StartDate = parsedTime.Add(-3 * time.Hour)
-
-					if err != nil {
-						log.Fatal(err)
-					}
-					parsedRow.EndDate = parsedRow.StartDate.Add(parsedRow.Duration)
+func (om OutageMuski) parseTable(table *goquery.Selection) ([]outage.Outage, error) {
+	var rowSlice []outage.Outage
+	rows := table.Find("tr")
+	for i := range rows.Nodes {
+		if i <= 2 {
+			continue
+		}
+		parsedRow := outage.Outage{}
+		cells := rows.Eq(i).Find("td")
+		for j := range cells.Nodes {
+			switch j {
+			case 2:
+				parsedRow.City = cells.Eq(j).Text()
+			case 3:
+				parsedRow.District = cells.Eq(j).Text()
+			case 4:
+				parsedDur, err := strconv.ParseInt(strings.TrimSuffix(cells.Eq(j).Text(), " Saat"), 0, 64)
+				if err != nil {
+					errors.Wrap(err, "Error parsing time from muski Table")
+					return []outage.Outage{}, err
 				}
-			})
-			if parsedRow.EndDate.UTC().After(time.Now().UTC()) {
-				rowSlice = append(rowSlice, parsedRow)
+				parsedRow.Duration = time.Duration(parsedDur) * time.Hour
+			case 5:
+				parsedTime, err := time.Parse(oldTimeFormat, strings.Trim(cells.Eq(j).Text(), " "))
+				if err != nil {
+					errors.Wrap(err, "Error parsing time from muski Table")
+					return []outage.Outage{}, err
+				}
+				parsedRow.StartDate = parsedTime.Add(-3 * time.Hour)
+				parsedRow.EndDate = parsedRow.StartDate.Add(parsedRow.Duration)
 			}
 		}
-	})
-	return rowSlice
+		if parsedRow.EndDate.UTC().After(time.Now().UTC()) {
+			parsedRow.Notes = ""
+			parsedRow.Resource = om.Resource
+			parsedRow.SourceURL = om.Url
+			rowSlice = append(rowSlice, parsedRow)
+		}
+	}
+
+	return rowSlice, nil
 }
 
 func (om OutageMuski) Crawl() ([]outage.Outage, error) {
@@ -99,7 +104,10 @@ func (om OutageMuski) Crawl() ([]outage.Outage, error) {
 		return []outage.Outage{}, err
 	}
 	table := doc.Find("table#plansiz")
-	rowSlice := om.parseTable(table)
+	rowSlice, err := om.parseTable(table)
+	if err != nil {
+		return []outage.Outage{}, err
+	}
 	rowSlice = om.expandDistr(rowSlice)
 	outages := []outage.Outage{}
 	outages = append(outages, rowSlice...)

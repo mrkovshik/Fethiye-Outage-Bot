@@ -118,7 +118,6 @@ func (d *DistrictStore) GetFuzzyMatch(input string) (District, error) {
 	if err != nil {
 		return District{}, err
 	}
-
 	if len(found) < 1 {
 		found, err := d.fuzzyQuery(dist, city)
 		if err != nil {

@@ -9,6 +9,7 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/database"
+	district "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
 	"github.com/pkg/errors"
 	"gotest.tools/assert"
@@ -114,7 +115,7 @@ func TestOutageStore_Validate(t *testing.T) {
 	var tests = []struct {
 		name    string
 		outages []outage.Outage
-		want    []outage.Outage
+		want    []district.District
 	}{
 		{"everything valid", []outage.Outage{{
 			Resource:  "water",
@@ -131,7 +132,7 @@ func TestOutageStore_Validate(t *testing.T) {
 				StartDate: time.Now(),
 				EndDate:   time.Now().Add(1 * time.Hour),
 				SourceURL: "test entry",
-			}}, []outage.Outage{}},
+			}}, []district.District{}},
 		{"something invalid", []outage.Outage{{
 			Resource:  "water",
 			City:      "Fethiye",
@@ -148,13 +149,9 @@ func TestOutageStore_Validate(t *testing.T) {
 				EndDate:   StartDate.Add(1 * time.Hour),
 				SourceURL: "test entry",
 			}},
-			[]outage.Outage{{
-				Resource:  "water",
-				City:      "Ankara",
-				District:  "Ankara",
-				StartDate: StartDate,
-				EndDate:   StartDate.Add(1 * time.Hour),
-				SourceURL: "test entry",
+			[]district.District{{
+				City: "Ankara",
+				Name: "Ankara",
 			}},
 		}}
 
@@ -163,17 +160,17 @@ func TestOutageStore_Validate(t *testing.T) {
 	testStore := NewOutageStore(db)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			outages, err := testStore.ValidateDistricts(tt.outages)
+			invDistr, err := testStore.ValidateDistricts(tt.outages)
 			if err != nil {
 				log.Fatal(err)
 			}
-			if len(outages) != len(tt.want) {
-				t.Errorf("want %v, get %v", tt.want, outages)
+			if len(invDistr) != len(tt.want) {
+				t.Errorf("want %v, get %v", tt.want, invDistr)
 			}
-			if len(outages) > 0 {
-				for i := range outages {
-					if !outages[i].Equal(tt.want[i]) {
-						t.Errorf("want %v, get %v", tt.want[i], outages[i])
+			if len(invDistr) > 0 {
+				for i := range invDistr {
+					if invDistr[i].Name != tt.want[i].Name || invDistr[i].City != tt.want[i].City {
+						t.Errorf("want %v, get %v", tt.want[i], invDistr[i])
 					}
 				}
 			}

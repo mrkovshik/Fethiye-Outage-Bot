@@ -127,18 +127,18 @@ func (os *OutageStore) GetOutagesByEndTime(t time.Time) ([]outage.Outage, error)
 	return os.Read(query)
 }
 
-func (os *OutageStore) ValidateDistricts(crawled []outage.Outage) ([]outage.Outage, error) {
+func (os *OutageStore) ValidateDistricts(crawled []outage.Outage) ([]district.District, error) {
 	var err error
-	unValidated := make([]outage.Outage, 0)
+	unValidated := make([]district.District, 0)
 	ds := district.NewDistrictStore(os.db)
 	for _, i := range crawled {
 		ok, err := ds.CheckStrictMatch(i.City, i.District)
 		if err != nil {
 			err = errors.Wrap(err, "Failed to validate:")
-			return []outage.Outage{}, err
+			return []district.District{}, err
 		}
 		if !ok {
-			unValidated = append(unValidated, i)
+			unValidated = append(unValidated, district.District{Name: i.District, City: i.City})
 		}
 	}
 	return unValidated, err
@@ -188,13 +188,13 @@ func (o OutageStore) FetchOutages(cfg config.Config, logger *zap.Logger) {
 	for _, crw := range crawlers {
 		res, err := crawling.CrawlOutages(crw)
 		if err != nil {
-			logger.Sugar().Fatal(err)
+			logger.Sugar().Warn(err)
 		}
 		crawled = append(crawled, res...)
 	}
 	invalidDistr, err := o.ValidateDistricts(crawled)
 	if err != nil {
-		logger.Sugar().Fatal(err)
+		logger.Sugar().Warn(err)
 	}
 	if invalidDistr != nil {
 		logger.Warn("Attempt to add folowing invalid Districts to DB",
@@ -203,12 +203,12 @@ func (o OutageStore) FetchOutages(cfg config.Config, logger *zap.Logger) {
 	}
 	f, err := o.FindNew(crawled)
 	if err != nil {
-		logger.Sugar().Fatal(err)
+		logger.Sugar().Warn(err)
 	}
 	logger.Debug("Crawling started")
 	err = o.Save(f)
 	if err != nil {
-		logger.Sugar().Fatal(err)
+		logger.Sugar().Warn(err)
 	}
 
 }
