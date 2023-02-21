@@ -55,14 +55,14 @@ func (om OutageMuski) parseTable(table *goquery.Selection) ([]outage.Outage, err
 			case 4:
 				parsedDur, err := strconv.ParseInt(strings.TrimSuffix(cells.Eq(j).Text(), " Saat"), 0, 64)
 				if err != nil {
-					errors.Wrap(err, "Error parsing time from muski Table")
+					err=errors.Wrap(err, "Error parsing time from muski Table")
 					return []outage.Outage{}, err
 				}
 				parsedRow.Duration = time.Duration(parsedDur) * time.Hour
 			case 5:
 				parsedTime, err := time.Parse(oldTimeFormat, strings.Trim(cells.Eq(j).Text(), " "))
 				if err != nil {
-					errors.Wrap(err, "Error parsing time from muski Table")
+					err=errors.Wrap(err, "Error parsing time from muski Table")
 					return []outage.Outage{}, err
 				}
 				parsedRow.StartDate = parsedTime.Add(-3 * time.Hour)
@@ -85,22 +85,22 @@ func (om OutageMuski) Crawl() ([]outage.Outage, error) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", om.Url, nil)
 	if err != nil {
-		errors.Wrap(err, "Error wrapping request for Muski URL")
+		err=errors.Wrap(err, "Error wrapping request for Muski URL")
 		return []outage.Outage{}, err
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		errors.Wrap(err, "Error requesting Muski URL")
+		err=errors.Wrap(err, "Error requesting Muski URL")
 		return []outage.Outage{}, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		errors.Wrap(err, "Response from Muski is not OK")
+		err=errors.Wrap(err, "Response from Muski is not OK")
 		return []outage.Outage{}, err
 	}
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		errors.Wrap(err, "Error reading Muski response")
+		err=errors.Wrap(err, "Error reading Muski response")
 		return []outage.Outage{}, err
 	}
 	table := doc.Find("table#plansiz")

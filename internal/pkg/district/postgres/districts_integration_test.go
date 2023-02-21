@@ -19,7 +19,7 @@ import (
 func TestDistrictStore_StrictMatch(t *testing.T) {
 	// use local database, TODO mock
 	if err := config.ReadConfigYML("../../../../config.yml"); err != nil {
-		errors.Wrap(err, "Failed init configuration")
+		err=errors.Wrap(err, "Failed init configuration")
 		log.Fatal(err)
 	}
 	cfg := config.GetConfigInstance()
@@ -77,7 +77,7 @@ func TestDistrictStore_StrictMatch(t *testing.T) {
 func TestDistrictStore_FuzzyMatch(t *testing.T) {
 	// use local database, TODO mock
 	if err := config.ReadConfigYML("../../../../config.yml"); err != nil {
-		errors.Wrap(err, "Failed init configuration")
+		err=errors.Wrap(err, "Failed init configuration")
 		log.Fatal(err)
 	}
 	cfg := config.GetConfigInstance()

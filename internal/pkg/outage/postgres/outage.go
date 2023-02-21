@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"fmt"
-
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -183,7 +182,7 @@ func (o OutageStore) FetchOutages(cfg config.Config, logger *zap.Logger) {
 		Aydem,
 		Muski,
 	}
-	logger.Debug("Crawling started")
+	logger.Sugar().Infoln("Crawling started")
 	crawled := make([]outage.Outage, 0)
 	for _, crw := range crawlers {
 		res, err := crawling.CrawlOutages(crw)
@@ -205,7 +204,7 @@ func (o OutageStore) FetchOutages(cfg config.Config, logger *zap.Logger) {
 	if err != nil {
 		logger.Sugar().Warn(err)
 	}
-	logger.Debug("Crawling started")
+	logger.Sugar().Infoln("Crawling finished")
 	err = o.Save(f)
 	if err != nil {
 		logger.Sugar().Warn(err)

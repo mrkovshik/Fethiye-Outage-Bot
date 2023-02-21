@@ -17,7 +17,7 @@ import (
 
 func TestOutageStore_Save(t *testing.T) {
 	if err := config.ReadConfigYML("../../../../config.yml"); err != nil {
-		errors.Wrap(err, "Failed init configuration")
+		err=errors.Wrap(err, "Failed init configuration")
 		log.Fatal(err)
 	}
 	cfg := config.GetConfigInstance()
@@ -60,7 +60,7 @@ func TestOutageStore_Save(t *testing.T) {
 
 func TestOutageStore_Get(t *testing.T) {
 	if err := config.ReadConfigYML("../../../../config.yml"); err != nil {
-		errors.Wrap(err, "Failed init configuration")
+		err=errors.Wrap(err, "Failed init configuration")
 		log.Fatal(err)
 	}
 	cfg := config.GetConfigInstance()
@@ -100,7 +100,7 @@ func TestOutageStore_Get(t *testing.T) {
 
 func TestOutageStore_Validate(t *testing.T) {
 	if err := config.ReadConfigYML("../../../../config.yml"); err != nil {
-		errors.Wrap(err, "Failed init configuration")
+		err=errors.Wrap(err, "Failed init configuration")
 		log.Fatal(err)
 	}
 	cfg := config.GetConfigInstance()
