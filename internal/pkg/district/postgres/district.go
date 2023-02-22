@@ -3,10 +3,11 @@ package district
 import (
 	"fmt"
 	"strings"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
-
 )
+
 type District struct {
 	Name string
 	City string
@@ -43,25 +44,23 @@ func NewDistrictStore(db *sqlx.DB) *DistrictStore {
 func (sstr *DistrictStore) Read(query string) ([]District, error) {
 	rows, err := sstr.db.Query(query)
 	if err != nil {
-		fmt.Println("Failed to query database:", err)
+		err = fmt.Errorf("Failed to query database: %v", err)
 		return []District{}, err
 	}
 	defer rows.Close()
-
 	qryRes := make([]District, 0)
 	for rows.Next() {
 		var s districtRow
 		if err := rows.Scan(&s.City, &s.Name); err != nil {
-			fmt.Println("Failed to scan row:", err)
+			err = fmt.Errorf("Failed to scan row: %v", err)
 			return []District{}, err
 		}
 		qryRes = append(qryRes, s.marshal())
 	}
 	if err := rows.Err(); err != nil {
-		fmt.Println("Error iterating through rows:", err)
+		err = fmt.Errorf("Error iterating through rows: %v", err)
 		return []District{}, err
 	}
-
 	return qryRes, err
 }
 
@@ -69,18 +68,22 @@ func (d *DistrictStore) CheckStrictMatch(cit string, dis string) (bool, error) {
 	query := fmt.Sprintf("SELECT city, district FROM districts WHERE district ILIKE '%v' AND city ILIKE '%v';", dis, cit)
 	found, err := d.Read(query)
 	if err != nil {
-		fmt.Println("Failed to query database:", err)
+		err = fmt.Errorf("Failed to query database: %v", err)
 		return false, err
 	}
 	if len(found) < 1 {
 		return false, err
 	}
-
 	return true, err
 }
+
 func (d *DistrictStore) fuzzyQuery(city string, dist string) ([]District, error) {
 	var query string
-	cfg := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		err = fmt.Errorf("Error fuzzy query to database: %v", err)
+		return []District{}, err
+	}
 	levRatio := cfg.SearchConfig.LevRatio //Levenstein searching ratio from config
 	simRatio := cfg.SearchConfig.SimRatio //Similarity searching ratio from config
 	if city == "" {
@@ -90,15 +93,13 @@ func (d *DistrictStore) fuzzyQuery(city string, dist string) ([]District, error)
 	}
 	found, err := d.Read(query)
 	if err != nil {
-		fmt.Println("Failed to query database:", err)
-
+		err = fmt.Errorf("Error fuzzy query to database: %v", err)
 	}
 	result := found
 	return result, err
 }
 
 func (d *DistrictStore) GetFuzzyMatch(input string) (District, error) {
-
 	var city, dist string
 	var err error
 	s := strings.Split(input, " ")
@@ -117,7 +118,6 @@ func (d *DistrictStore) GetFuzzyMatch(input string) (District, error) {
 	if err != nil {
 		return District{}, err
 	}
-
 	if len(found) < 1 {
 		found, err := d.fuzzyQuery(dist, city)
 		if err != nil {
@@ -132,6 +132,5 @@ func (d *DistrictStore) GetFuzzyMatch(input string) (District, error) {
 			return found[0], err
 		}
 	}
-
 	return found[0], err
 }

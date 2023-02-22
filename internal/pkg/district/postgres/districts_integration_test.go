@@ -7,18 +7,29 @@ import (
 	"log"
 	"testing"
 
+	"github.com/pkg/errors"
+
 	_ "github.com/jackc/pgx/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/database"
+	"go.uber.org/zap"
 )
 
 func TestDistrictStore_StrictMatch(t *testing.T) {
 	// use local database, TODO mock
 	if err := config.ReadConfigYML("../../../../config.yml"); err != nil {
-		log.Fatal("Failed init configuration")
+		err=errors.Wrap(err, "Failed init configuration")
+		log.Fatal(err)
 	}
 	cfg := config.GetConfigInstance()
+	// Create a logger from the configuration
+	logger, err := cfg.LoggerConfig.Build()
+	if err != nil {
+		log.Fatal(err)
+	}
+	//nolint:errcheck
+	defer logger.Sync()
 
 	dsn := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=%v",
 		cfg.Database.Host,
@@ -28,11 +39,14 @@ func TestDistrictStore_StrictMatch(t *testing.T) {
 		cfg.Database.Name,
 		cfg.Database.SslMode,
 	)
-	log.Printf(dsn)
-
+	logger.Info("dsn: ",
+		zap.String("", dsn),
+	)
 	db, err := database.NewPostgres(dsn, cfg.Database.Driver)
 	if err != nil {
-		log.Fatal("Failed init postgres")
+		logger.Fatal("Failed init postgres",
+			zap.Error(err),
+		)
 	}
 	defer db.Close()
 	// TODO initialise out of test scope
@@ -63,9 +77,17 @@ func TestDistrictStore_StrictMatch(t *testing.T) {
 func TestDistrictStore_FuzzyMatch(t *testing.T) {
 	// use local database, TODO mock
 	if err := config.ReadConfigYML("../../../../config.yml"); err != nil {
-		log.Fatal("Failed init configuration")
+		err=errors.Wrap(err, "Failed init configuration")
+		log.Fatal(err)
 	}
 	cfg := config.GetConfigInstance()
+	// Create a logger from the configuration
+	logger, err := cfg.LoggerConfig.Build()
+	if err != nil {
+		log.Fatal(err)
+	}
+	//nolint:errcheck
+	defer logger.Sync()
 
 	dsn := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=%v",
 		cfg.Database.Host,
@@ -75,11 +97,14 @@ func TestDistrictStore_FuzzyMatch(t *testing.T) {
 		cfg.Database.Name,
 		cfg.Database.SslMode,
 	)
-	log.Printf(dsn)
-
+	logger.Info("dsn: ",
+		zap.String("", dsn),
+	)
 	db, err := database.NewPostgres(dsn, cfg.Database.Driver)
 	if err != nil {
-		log.Fatal("Failed init postgres")
+		logger.Fatal("Failed init postgres",
+			zap.Error(err),
+		)
 	}
 	defer db.Close()
 	// TODO initialise out of test scope
