@@ -83,6 +83,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Add release date
+        run:  sed -i '4a\  version':' '$(date +%Y%m%d%H%M%S)'' config.yml
+
       - name: Copy config file
         uses: appleboy/scp-action@master
         with:
@@ -94,7 +97,7 @@ jobs:
 
   copy-templates:
     runs-on: ubuntu-latest
-    needs: [copy-logger-conf-file]
+    needs: [copy-conf-file]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
