@@ -1,11 +1,13 @@
 package crawling
 
-import "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
+import (
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
+)
 
 type Crawler interface {
-	Crawl() []outage.Outage
+	Crawl() ([]outage.Outage, error)
 }
 
-func CrawlOutages(c Crawler) []outage.Outage {
+func CrawlOutages(c Crawler) ([]outage.Outage, error) {
 	return c.Crawl()
 }

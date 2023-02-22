@@ -2,7 +2,7 @@ project:
   name: Fethiye Outage Bot
   debug: true
   environment: development
-
+  
 database:
   host: localhost
   port: 5432
@@ -23,3 +23,17 @@ searchconfig:
 
 schedulerconfig:
   fetch_period: '@every 30m'
+
+loggerconfig:
+  level: debug
+  encoding: json
+  outputPaths:
+  - stdout
+  - "/tmp/logs"
+  errorOutputPaths:
+  - stderr
+  initialFields: {}
+  encoderConfig:
+    messageKey: message
+    levelKey: level
+    levelEncoder: lowercase

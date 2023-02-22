@@ -45,29 +45,27 @@ func NewDistrictStore(db *sqlx.DB) *DistrictStore {
 func (sstr *DistrictStore) Read(query string) ([]District, error) {
 	rows, err := sstr.db.Query(query)
 	if err != nil {
-		fmt.Println("Failed to query database:", err)
+		err = errors.Wrap(err, "Error query to database:")
 		return []District{}, err
 	}
 	defer rows.Close()
-
 	qryRes := make([]District, 0)
 	for rows.Next() {
 		var s districtRow
 		if err := rows.Scan(&s.City, &s.Name); err != nil {
-			fmt.Println("Failed to scan row:", err)
+			err = errors.Wrap(err, "Failed to scan DB row:")
 			return []District{}, err
 		}
 		qryRes = append(qryRes, s.marshal())
 	}
 	if err := rows.Err(); err != nil {
-		fmt.Println("Error iterating through rows:", err)
+		err = errors.Wrap(err, "Error iterating through DB rows:")
 		return []District{}, err
 	}
-
 	return qryRes, err
 }
 
-func countRatio (s string, levRatio int) int {
+func countRatio(s string, levRatio int) int {
 	res := len(s) - levRatio - 1
 	switch {
 	case res < 0:
@@ -82,22 +80,26 @@ func (d *DistrictStore) CheckStrictMatch(cit string, dis string) (bool, error) {
 	query := fmt.Sprintf("SELECT city, district FROM districts WHERE district ILIKE '%v' AND city ILIKE '%v';", dis, cit)
 	found, err := d.Read(query)
 	if err != nil {
-		fmt.Println("Failed to query database:", err)
+		err = errors.Wrap(err, "Failed to read from database: ")
 		return false, err
 	}
 	if len(found) < 1 {
 		return false, err
 	}
-
 	return true, err
 }
+
 func (d *DistrictStore) fuzzyQuery(city string, dist string) ([]District, error) {
 	var query string
-	cfg := config.GetConfig()
-
-	levRatio,err := strconv.Atoi(cfg.SearchConfig.LevRatio) //Levenstein searching ratio from config
+	cfg, err := config.GetConfig()
 	if err != nil {
-		errors.Wrap(err,"Error converting levRatio")
+		err = errors.Wrap(err, "Error fuzzy query to database:")
+		return []District{}, err
+	}
+	levRatio, err := strconv.Atoi(cfg.SearchConfig.LevRatio) //Levenstein searching ratio from config
+	if err != nil {
+		err = errors.Wrap(err, "Error converting levRatio")
+		return []District{}, err
 	}
 	cityLevRatio := countRatio(city, levRatio)
 	districtLevRatio := countRatio(dist, levRatio)
@@ -109,8 +111,8 @@ func (d *DistrictStore) fuzzyQuery(city string, dist string) ([]District, error)
 	}
 	found, err := d.Read(query)
 	if err != nil {
-		fmt.Println("Failed to query database:", err)
-
+		err = errors.Wrap(err, "Error reading from database:")
+		return []District{}, err
 	}
 	result := found
 	return result, err
@@ -139,14 +141,13 @@ func (d *DistrictStore) GetFuzzyMatch(s []string) (District, error) {
 	if err != nil {
 		return District{}, err
 	}
-
 	if len(found) < 1 {
 		found, err = d.fuzzyQuery(dist, city)
 		if err != nil {
 			return District{}, err
 		}
-		if len(found)<1{
-			found, err = d.fuzzyQuery("",city+dist)
+		if len(found) < 1 {
+			found, err = d.fuzzyQuery("", city+dist)
 			if err != nil {
 				return District{}, err
 			}
@@ -160,6 +161,5 @@ func (d *DistrictStore) GetFuzzyMatch(s []string) (District, error) {
 			return found[0], err
 		}
 	}
-
 	return found[0], err
 }
