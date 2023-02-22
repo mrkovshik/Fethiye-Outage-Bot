@@ -7,6 +7,8 @@ on:
   pull_request:
     branches:
       - main
+    types:
+      - closed
 
 jobs:
   build:
@@ -153,3 +155,34 @@ jobs:
             key: ${{ secrets.SSH_KEY }}
             script: |
               chmod +x ./outage_bot/outage_bot && sudo systemctl daemon-reload && sudo systemctl restart outagebot.service && sudo systemctl status outagebot.service            
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+
+      - name: Linter-check
+        run: go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.50.1 run
+
+      - name: Build
+        run: go build -o outage_bot ./cmd/
+
+      # - name: Test
+      #   run: go test -v ./...
+
+      - name: Transfer
+        uses: actions/upload-artifact@v3
+        with:
+          name: outage_bot
+          path: outage_bot                   
