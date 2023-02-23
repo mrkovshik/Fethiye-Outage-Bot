@@ -2,10 +2,11 @@ package district
 
 import (
 	"fmt"
-	"strings"
+	"strconv"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
+	"github.com/pkg/errors"
 )
 
 type District struct {
@@ -44,7 +45,7 @@ func NewDistrictStore(db *sqlx.DB) *DistrictStore {
 func (sstr *DistrictStore) Read(query string) ([]District, error) {
 	rows, err := sstr.db.Query(query)
 	if err != nil {
-		err = fmt.Errorf("Failed to query database: %v", err)
+		err = errors.Wrap(err, "Error query to database:")
 		return []District{}, err
 	}
 	defer rows.Close()
@@ -52,23 +53,31 @@ func (sstr *DistrictStore) Read(query string) ([]District, error) {
 	for rows.Next() {
 		var s districtRow
 		if err := rows.Scan(&s.City, &s.Name); err != nil {
-			err = fmt.Errorf("Failed to scan row: %v", err)
+			err = errors.Wrap(err, "Failed to scan DB row:")
 			return []District{}, err
 		}
 		qryRes = append(qryRes, s.marshal())
 	}
 	if err := rows.Err(); err != nil {
-		err = fmt.Errorf("Error iterating through rows: %v", err)
+		err = errors.Wrap(err, "Error iterating through DB rows:")
 		return []District{}, err
 	}
 	return qryRes, err
+}
+
+func countRatio(s string, levRatio int) int {
+	res := len(s) * levRatio / 10
+if res>levRatio{
+	res=levRatio
+}
+	return res
 }
 
 func (d *DistrictStore) CheckStrictMatch(cit string, dis string) (bool, error) {
 	query := fmt.Sprintf("SELECT city, district FROM districts WHERE district ILIKE '%v' AND city ILIKE '%v';", dis, cit)
 	found, err := d.Read(query)
 	if err != nil {
-		err = fmt.Errorf("Failed to query database: %v", err)
+		err = errors.Wrap(err, "Failed to read from database: ")
 		return false, err
 	}
 	if len(found) < 1 {
@@ -81,28 +90,35 @@ func (d *DistrictStore) fuzzyQuery(city string, dist string) ([]District, error)
 	var query string
 	cfg, err := config.GetConfig()
 	if err != nil {
-		err = fmt.Errorf("Error fuzzy query to database: %v", err)
+		err = errors.Wrap(err, "Error fuzzy query to database:")
 		return []District{}, err
 	}
-	levRatio := cfg.SearchConfig.LevRatio //Levenstein searching ratio from config
+	levRatio, err := strconv.Atoi(cfg.SearchConfig.LevRatio) //Levenstein searching ratio from config
+	if err != nil {
+		err = errors.Wrap(err, "Error converting levRatio")
+		return []District{}, err
+	}
+	cityLevRatio := countRatio(city, levRatio)
+	districtLevRatio := countRatio(dist, levRatio)
 	simRatio := cfg.SearchConfig.SimRatio //Similarity searching ratio from config
 	if city == "" {
-		query = fmt.Sprintf("SELECT city, district FROM districts where LEVENSHTEIN(district, '%v')<%v or Similarity(district, '%v')>%v ORDER BY LEVENSHTEIN(district, '%v') asc, Similarity(district, '%v') desc LIMIT 1;", dist, levRatio, dist, simRatio, dist, dist)
+		query = fmt.Sprintf("SELECT city, district FROM districts where LEVENSHTEIN(district_normalized, '%v')<%v or Similarity(district_normalized, '%v')>%v ORDER BY LEVENSHTEIN(district_normalized, '%v') asc, Similarity(district_normalized, '%v') desc LIMIT 1;", dist, districtLevRatio, dist, simRatio, dist, dist)
 	} else {
-		query = fmt.Sprintf("SELECT city, district FROM districts where (LEVENSHTEIN(district, '%v')<%v or Similarity(district, '%v')>%v) and (LEVENSHTEIN(city, '%v')<%v or Similarity(city, '%v') >%v) ORDER BY LEVENSHTEIN(district, '%v') asc, LEVENSHTEIN(city, '%v') asc, Similarity(district, '%v') desc, Similarity(city, '%v') desc LIMIT 1;", dist, levRatio, dist, simRatio, city, levRatio, city, simRatio, dist, city, dist, city)
+		query = fmt.Sprintf("SELECT city, district FROM districts where (LEVENSHTEIN(district_normalized, '%v')<%v or Similarity(district_normalized, '%v')>%v) and (LEVENSHTEIN(city_normalized, '%v')<%v or Similarity(city_normalized, '%v') >%v) ORDER BY LEVENSHTEIN(district_normalized, '%v') asc, LEVENSHTEIN(city_normalized, '%v') asc, Similarity(district_normalized, '%v') desc, Similarity(city_normalized, '%v') desc LIMIT 1;", dist, districtLevRatio, dist, simRatio, city, cityLevRatio, city, simRatio, dist, city, dist, city)
 	}
 	found, err := d.Read(query)
 	if err != nil {
-		err = fmt.Errorf("Error fuzzy query to database: %v", err)
+		err = errors.Wrap(err, "Error reading from database:")
+		return []District{}, err
 	}
 	result := found
 	return result, err
 }
 
-func (d *DistrictStore) GetFuzzyMatch(input string) (District, error) {
+func (d *DistrictStore) GetFuzzyMatch(s []string) (District, error) {
+
 	var city, dist string
 	var err error
-	s := strings.Split(input, " ")
 	if len(s) == 0 {
 		return District{}, err
 	}
@@ -114,14 +130,24 @@ func (d *DistrictStore) GetFuzzyMatch(input string) (District, error) {
 		city = s[0]
 		dist = s[1]
 	}
+	if len(s) > 2 {
+		city = s[0]
+		dist = s[1] + " " + s[2]
+	}
 	found, err := d.fuzzyQuery(city, dist)
 	if err != nil {
 		return District{}, err
 	}
 	if len(found) < 1 {
-		found, err := d.fuzzyQuery(dist, city)
+		found, err = d.fuzzyQuery(dist, city)
 		if err != nil {
 			return District{}, err
+		}
+		if len(found) < 1 {
+			found, err = d.fuzzyQuery("", city+dist)
+			if err != nil {
+				return District{}, err
+			}
 		}
 		if len(found) < 1 {
 			return District{

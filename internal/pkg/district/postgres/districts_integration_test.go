@@ -112,18 +112,18 @@ func TestDistrictStore_FuzzyMatch(t *testing.T) {
 
 	var tests = []struct {
 		name      string
-		input     string
+		input     []string
 		wantCity  string
 		wantDistr string
 	}{
-		{"normal query", "Fethiye Karaçulha", "Fethiye", "Karaçulha"},
-		{"caps", "FETHIYE Karaçulha", "Fethiye", "Karaçulha"},
-		{"wrong spelling", "Fetie menteseolu", "Fethiye", "Menteşeoğlu"},
-		{"non existing city", "sadfsdfasd Karaçulha", "Fethiye", "Karaçulha"},
-		{"only district", "Karaçulha", "Fethiye", "Karaçulha"},
-		{"total nonsense", "lsdfhjk iorewjg", "no matches", "no matches"},
-		{"no space", "FethiyeKaraçulha", "Fethiye", "Karaçulha"},
-		{"vice versa", "Karaçulha Fethiye", "Fethiye", "Karaçulha"},
+		{"normal query", [] string{"fethiye" ,"karaculha"}, "Fethiye", "Karaçulha"},
+		{"wrong spelling", [] string{"fethie" ,"menteseolu"}, "Fethiye", "Menteşeoğlu"},
+		{"non existing city", [] string{"sadfsdfasd" ,"karaculha"}, "no matches", "no matches"},
+		{"only district", [] string{"karaculha"}, "Fethiye", "Karaçulha"},
+		{"total nonsense", [] string{"lsdfhjk" ,"iorewjg"}, "no matches", "no matches"},
+		{"no space", [] string{"fethiyekaraculha"}, "Fethiye", "Karaçulha"},
+		{"vice versa", [] string{"karaculha" ,"fethiye"}, "Fethiye", "Karaçulha"},
+		{"2-word mahalle", [] string{"milas", "firuzpasa", "gazipasa"}, "Milas", "Firuzpaşa-Gazipaşa"},
 	}
 
 	for _, tt := range tests {
