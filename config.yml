@@ -19,7 +19,10 @@ crawlersurl:
 
 searchconfig:
   simratio: 0.4
-  levratio: 3
+  # this ratio represents levenstein distance for the fuzzy search
+  # for the words with length >= 10. it decreases lineary to 0
+  #  for the words with length <10 
+  levratio: 3 
 
 schedulerconfig:
   fetch_period: '@every 30m'

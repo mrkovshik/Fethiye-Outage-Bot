@@ -4,10 +4,15 @@ import (
 	"bytes"
 	"os"
 	"regexp"
+	"strings"
 	"text/template"
 	"time"
+	"unicode"
 
 	"github.com/pkg/errors"
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	district "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
@@ -27,12 +32,18 @@ func (t *tool) formatDateAndMakeLocal(tm time.Time) string {
 }
 
 func (t *tool) sanitize(s string) ([]string, error) {
-	re, err := regexp.Compile(`[\p{L}\d_]+`)
+	tr := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+    output, _, err := transform.String(tr, s)
 	if err != nil {
-		err = errors.Wrap(err, "Error sanitazing input query")
+		err = errors.Wrap(err, "Error transforming input query")
 		return []string{}, err
 	}
-	res := re.FindAllString(s, -1)
+	re, err := regexp.Compile(`[\p{L}\d_]+`)
+	if err != nil {
+		err = errors.Wrap(err, "Error compiling regexp input query")
+		return []string{}, err
+	}
+	res := re.FindAllString(strings.ToLower(output), -1)
 	return res, err
 }
 

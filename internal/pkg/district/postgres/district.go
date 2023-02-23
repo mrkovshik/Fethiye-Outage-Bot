@@ -66,13 +66,10 @@ func (sstr *DistrictStore) Read(query string) ([]District, error) {
 }
 
 func countRatio(s string, levRatio int) int {
-	res := len(s) - levRatio - 1
-	switch {
-	case res < 0:
-		res = 0
-	case res > levRatio:
-		res = levRatio
-	}
+	res := len(s) * levRatio / 10
+if res>levRatio{
+	res=levRatio
+}
 	return res
 }
 
@@ -105,9 +102,9 @@ func (d *DistrictStore) fuzzyQuery(city string, dist string) ([]District, error)
 	districtLevRatio := countRatio(dist, levRatio)
 	simRatio := cfg.SearchConfig.SimRatio //Similarity searching ratio from config
 	if city == "" {
-		query = fmt.Sprintf("SELECT city, district FROM districts where LEVENSHTEIN(district, '%v')<%v or Similarity(district, '%v')>%v ORDER BY LEVENSHTEIN(district, '%v') asc, Similarity(district, '%v') desc LIMIT 1;", dist, districtLevRatio, dist, simRatio, dist, dist)
+		query = fmt.Sprintf("SELECT city, district FROM districts where LEVENSHTEIN(district_normalized, '%v')<%v or Similarity(district_normalized, '%v')>%v ORDER BY LEVENSHTEIN(district_normalized, '%v') asc, Similarity(district_normalized, '%v') desc LIMIT 1;", dist, districtLevRatio, dist, simRatio, dist, dist)
 	} else {
-		query = fmt.Sprintf("SELECT city, district FROM districts where (LEVENSHTEIN(district, '%v')<%v or Similarity(district, '%v')>%v) and (LEVENSHTEIN(city, '%v')<%v or Similarity(city, '%v') >%v) ORDER BY LEVENSHTEIN(district, '%v') asc, LEVENSHTEIN(city, '%v') asc, Similarity(district, '%v') desc, Similarity(city, '%v') desc LIMIT 1;", dist, districtLevRatio, dist, simRatio, city, cityLevRatio, city, simRatio, dist, city, dist, city)
+		query = fmt.Sprintf("SELECT city, district FROM districts where (LEVENSHTEIN(district_normalized, '%v')<%v or Similarity(district_normalized, '%v')>%v) and (LEVENSHTEIN(city_normalized, '%v')<%v or Similarity(city_normalized, '%v') >%v) ORDER BY LEVENSHTEIN(district_normalized, '%v') asc, LEVENSHTEIN(city_normalized, '%v') asc, Similarity(district_normalized, '%v') desc, Similarity(city_normalized, '%v') desc LIMIT 1;", dist, districtLevRatio, dist, simRatio, city, cityLevRatio, city, simRatio, dist, city, dist, city)
 	}
 	found, err := d.Read(query)
 	if err != nil {
