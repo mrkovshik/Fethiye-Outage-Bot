@@ -1,5 +1,5 @@
 {{define "badQuery"}}
-I am sorry, but I can't find anythithg like _*'{{.Text}}'*_
+I am sorry, but I can't find anythithg like _*'{{escape (.Text)}}'*_
 
 Maybe we should try again?
 Please print your city and neigbourhood divided by space, for example _*'Fethie Taşyaka'*_"
@@ -20,7 +20,7 @@ Please print your city and neigbourhood divided by space, for example _*'Fethie 
 
 
 {{define "confirmDistr"}}
-Did you mean _*{{.City}} {{.Name}}*_?{{end}}
+Did you mean _*{{escape (.City)}} {{escape (.Name)}}*_?{{end}}
 
 {{define "startMsg"}}
 Please print your city and neigbourhood divided by space, for example _*'Fethiye Taşyaka'*_
