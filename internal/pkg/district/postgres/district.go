@@ -10,19 +10,26 @@ import (
 )
 
 type District struct {
-	Name string
-	City string
+	Name           string
+	City           string
+	NameNormalized string
+	CityNormalized string
 }
 
 type districtRow struct {
-	City string `db:"city"`
-	Name string `db:"district"`
+	City           string `db:"city"`
+	Name           string `db:"district"`
+	NameNormalized string `db:"city_normalized"`
+	CityNormalized string `db:"district_normalized"`
 }
 
 func (d *districtRow) marshal() District {
 	return District{
 		City: d.City,
 		Name: d.Name,
+		NameNormalized: d.NameNormalized,
+		CityNormalized: d.CityNormalized,
+
 	}
 }
 
@@ -52,7 +59,7 @@ func (sstr *DistrictStore) Read(query string) ([]District, error) {
 	qryRes := make([]District, 0)
 	for rows.Next() {
 		var s districtRow
-		if err := rows.Scan(&s.City, &s.Name); err != nil {
+		if err := rows.Scan(&s.City, &s.Name, &s.CityNormalized, &s.NameNormalized); err != nil {
 			err = errors.Wrap(err, "Failed to scan DB row:")
 			return []District{}, err
 		}
@@ -67,14 +74,14 @@ func (sstr *DistrictStore) Read(query string) ([]District, error) {
 
 func countRatio(s string, levRatio int) int {
 	res := len(s) * levRatio / 10
-if res>levRatio{
-	res=levRatio
-}
+	if res > levRatio {
+		res = levRatio
+	}
 	return res
 }
 
 func (d *DistrictStore) CheckStrictMatch(cit string, dis string) (bool, error) {
-	query := fmt.Sprintf("SELECT city, district FROM districts WHERE district ILIKE '%v' AND city ILIKE '%v';", dis, cit)
+	query := fmt.Sprintf("SELECT city, district, city_normalized, district_normalized FROM districts WHERE district_normalized='%v' AND city_normalized='%v';", dis, cit)
 	found, err := d.Read(query)
 	if err != nil {
 		err = errors.Wrap(err, "Failed to read from database: ")
@@ -102,9 +109,9 @@ func (d *DistrictStore) fuzzyQuery(city string, dist string) ([]District, error)
 	districtLevRatio := countRatio(dist, levRatio)
 	simRatio := cfg.SearchConfig.SimRatio //Similarity searching ratio from config
 	if city == "" {
-		query = fmt.Sprintf("SELECT city, district FROM districts where LEVENSHTEIN(district_normalized, '%v')<%v or Similarity(district_normalized, '%v')>%v ORDER BY LEVENSHTEIN(district_normalized, '%v') asc, Similarity(district_normalized, '%v') desc LIMIT 1;", dist, districtLevRatio, dist, simRatio, dist, dist)
+		query = fmt.Sprintf("SELECT city, district, city_normalized, district_normalized FROM districts where LEVENSHTEIN(district_normalized, '%v')<%v or Similarity(district_normalized, '%v')>%v ORDER BY LEVENSHTEIN(district_normalized, '%v') asc, Similarity(district_normalized, '%v') desc LIMIT 1;", dist, districtLevRatio, dist, simRatio, dist, dist)
 	} else {
-		query = fmt.Sprintf("SELECT city, district FROM districts where (LEVENSHTEIN(district_normalized, '%v')<%v or Similarity(district_normalized, '%v')>%v) and (LEVENSHTEIN(city_normalized, '%v')<%v or Similarity(city_normalized, '%v') >%v) ORDER BY LEVENSHTEIN(district_normalized, '%v') asc, LEVENSHTEIN(city_normalized, '%v') asc, Similarity(district_normalized, '%v') desc, Similarity(city_normalized, '%v') desc LIMIT 1;", dist, districtLevRatio, dist, simRatio, city, cityLevRatio, city, simRatio, dist, city, dist, city)
+		query = fmt.Sprintf("SELECT city, district, city_normalized, district_normalized FROM districts where (LEVENSHTEIN(district_normalized, '%v')<%v or Similarity(district_normalized, '%v')>%v) and (LEVENSHTEIN(city_normalized, '%v')<%v or Similarity(city_normalized, '%v') >%v) ORDER BY LEVENSHTEIN(district_normalized, '%v') asc, LEVENSHTEIN(city_normalized, '%v') asc, Similarity(district_normalized, '%v') desc, Similarity(city_normalized, '%v') desc LIMIT 1;", dist, districtLevRatio, dist, simRatio, city, cityLevRatio, city, simRatio, dist, city, dist, city)
 	}
 	found, err := d.Read(query)
 	if err != nil {

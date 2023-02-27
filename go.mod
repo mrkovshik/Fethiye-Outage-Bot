@@ -7,6 +7,8 @@ require (
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron v1.2.0
+	go.uber.org/zap v1.24.0
+	golang.org/x/text v0.6.0
 	gotest.tools v2.2.0+incompatible
 )
 
@@ -22,9 +24,7 @@ require (
 	github.com/lib/pq v1.10.7 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
-	golang.org/x/text v0.6.0 // indirect
 )
 
 require (

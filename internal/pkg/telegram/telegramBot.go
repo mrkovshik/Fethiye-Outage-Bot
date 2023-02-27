@@ -4,19 +4,13 @@ import (
 	"bytes"
 	"os"
 	"regexp"
-	"strings"
 	"text/template"
 	"time"
-	"unicode"
-
-	"github.com/pkg/errors"
-	"golang.org/x/text/runes"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	district "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage/postgres"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/util"
 	"go.uber.org/zap"
 )
 
@@ -29,22 +23,6 @@ func newTool() *tool {
 
 func (t *tool) formatDateAndMakeLocal(tm time.Time) string {
 	return tm.Add(3 * time.Hour).String()[:19]
-}
-
-func (t *tool) sanitize(s string) ([]string, error) {
-	tr := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
-    output, _, err := transform.String(tr, s)
-	if err != nil {
-		err = errors.Wrap(err, "Error transforming input query")
-		return []string{}, err
-	}
-	re, err := regexp.Compile(`[\p{L}\d_]+`)
-	if err != nil {
-		err = errors.Wrap(err, "Error compiling regexp input query")
-		return []string{}, err
-	}
-	res := re.FindAllString(strings.ToLower(output), -1)
-	return res, err
 }
 
 func (t *tool) escapeSimbols(s string) string {
@@ -96,7 +74,7 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, logger *
 					)
 				}
 			} else {
-				words, err := tool.sanitize(update.Message.Text)
+				words, err := util.Normalize(update.Message.Text)
 				if err != nil {
 					logger.Fatal("",
 						zap.Error(err),
@@ -115,7 +93,7 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, logger *
 							zap.Error(err),
 						)
 					}
-					userOutages, err := store.GetActiveOutagesByCityDistrict(guessDistr.Name, guessDistr.City)
+					userOutages, err := store.GetActiveOutagesByCityDistrict(guessDistr.NameNormalized, guessDistr.CityNormalized)
 					if err != nil {
 						logger.Fatal("",
 							zap.Error(err),

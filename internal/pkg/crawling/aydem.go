@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/util"
 	"github.com/pkg/errors"
 )
 
@@ -55,14 +56,14 @@ func (oa OutageAydem) ConvertToOutage(ad []AydemData) ([]outage.Outage, error) {
 		if i.Area == "MUĞLA" {
 			parsedEndDate, err := time.Parse(aydemTimeFormat, i.OutageEndDate[:16])
 			if err != nil {
-				err=errors.Wrap(err, "OutageEndDate parsing error")
+				err = errors.Wrap(err, "OutageEndDate parsing error")
 				return []outage.Outage{}, err
 			}
 			parsedEndDate = parsedEndDate.Add(-3 * time.Hour)
 			if parsedEndDate.After(time.Now().UTC()) {
 				parsedStartDate, err := time.Parse(aydemTimeFormat, i.OutageStartDate[:16])
 				if err != nil {
-					err=errors.Wrap(err, "OutageStartDate parsing error")
+					err = errors.Wrap(err, "OutageStartDate parsing error")
 					return []outage.Outage{}, err
 				}
 				parsedStartDate = parsedStartDate.Add(-3 * time.Hour)
@@ -74,6 +75,16 @@ func (oa OutageAydem) ConvertToOutage(ad []AydemData) ([]outage.Outage, error) {
 				o.StartDate = parsedStartDate
 				o.Notes = i.Street
 				o.SourceURL = oa.Url
+				nc, err := util.Normalize(o.City)
+				if err != nil {
+					return []outage.Outage{}, err
+				}
+				o.CityNormalized = strings.Join(nc, " ")
+				nd, err := util.Normalize(o.District)
+				if err != nil {
+					return []outage.Outage{}, err
+				}
+				o.DistrictNormalized = strings.Join(nd, " ")
 				res = append(res, o)
 			}
 		}
@@ -84,19 +95,19 @@ func (oa OutageAydem) ConvertToOutage(ad []AydemData) ([]outage.Outage, error) {
 func (oa OutageAydem) Crawl() ([]outage.Outage, error) {
 	response, err := http.Get(oa.Url)
 	if err != nil {
-		err=errors.Wrap(err, "Error querying Aydem URL")
+		err = errors.Wrap(err, "Error querying Aydem URL")
 		return []outage.Outage{}, err
 	}
 	defer response.Body.Close()
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		err=errors.Wrap(err, "Error reading response from Aydem")
+		err = errors.Wrap(err, "Error reading response from Aydem")
 		return []outage.Outage{}, err
 	}
 	var outages []AydemData
 	err = json.Unmarshal(body, &outages)
 	if err != nil {
-		err=errors.Wrap(err, "Error Unmarshalling json from Aydem")
+		err = errors.Wrap(err, "Error Unmarshalling json from Aydem")
 		return []outage.Outage{}, err
 	}
 	res, err := oa.ConvertToOutage(outages)

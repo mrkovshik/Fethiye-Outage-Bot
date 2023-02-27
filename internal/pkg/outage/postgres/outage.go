@@ -14,14 +14,16 @@ import (
 )
 
 type outageRow struct {
-	Resource  string    `db:"resource"`
-	City      string    `db:"city"`
-	District  string    `db:"district"`
-	StartDate time.Time `db:"start_date"`
-	EndDate   time.Time `db:"end_date"`
-	SourceURL string    `db:"source_url"`
-	Notes     string    `db:"notes"`
-	DateAdded time.Time `db:"date_added"`
+	Resource           string    `db:"resource"`
+	City               string    `db:"city"`
+	District           string    `db:"district"`
+	StartDate          time.Time `db:"start_date"`
+	EndDate            time.Time `db:"end_date"`
+	SourceURL          string    `db:"source_url"`
+	Notes              string    `db:"notes"`
+	DateAdded          time.Time `db:"date_added"`
+	CityNormalized     string    `db:"city_normalized"`
+	DistrictNormalized string    `db:"district_normalized"`
 	// UpdatedAt  sql.NullTime `db:"updated_at"`
 	// TODO if changed?
 	// Add enabled or processed
@@ -36,6 +38,9 @@ func (from *outageRow) marshal() outage.Outage {
 		EndDate:   from.EndDate,
 		SourceURL: from.SourceURL,
 		Notes:     from.Notes,
+		CityNormalized: from.CityNormalized,
+		DistrictNormalized: from.DistrictNormalized,
+
 	}
 }
 
@@ -52,6 +57,8 @@ func (or *outageRow) unmarshal(from outage.Outage) error {
 		SourceURL: from.SourceURL,
 		Notes:     from.Notes,
 		DateAdded: time.Now().UTC(),
+		CityNormalized: from.CityNormalized,
+		DistrictNormalized: from.DistrictNormalized,
 	}
 	return nil
 }
@@ -74,8 +81,8 @@ func NewOutageStore(db *sqlx.DB) *OutageStore {
 
 func (os *OutageStore) Save(o []outage.Outage) error {
 	// TODO from Columns
-	query := `INSERT INTO outages (resource, city, district, start_date, end_date, source_url, notes, date_added)
-  			VALUES (:resource, :city, :district, :start_date, :end_date, :source_url, :notes, :date_added);`
+	query := `INSERT INTO outages (resource, city, city_normalized, district, district_normalized, start_date, end_date, source_url, notes, date_added)
+  			VALUES (:resource, :city, :city_normalized, :district, :district_normalized, :start_date, :end_date, :source_url, :notes, :date_added);`
 
 	var orow outageRow
 	for _, i := range o {
@@ -116,15 +123,10 @@ func (os *OutageStore) Read(query string) ([]outage.Outage, error) {
 
 func (os *OutageStore) GetActiveOutagesByCityDistrict(distr string, city string) ([]outage.Outage, error) {
 	qrtime := time.Now().UTC().String()[:19]
-	query := fmt.Sprintf("SELECT resource, city, district, start_date, end_date, source_url, notes	FROM outages WHERE district ILIKE '%v' AND city ILIKE '%v' AND end_date > '%v';", ("%" + distr + "%"), ("%" + city + "%"), qrtime)
+	query := fmt.Sprintf("SELECT resource, city, district, start_date, end_date, source_url, notes	FROM outages WHERE district_normalized='%v' AND city_normalized='%v' AND end_date > '%v';", distr, city, qrtime)
 	return os.Read(query)
 }
 
-func (os *OutageStore) GetOutagesByEndTime(t time.Time) ([]outage.Outage, error) {
-	qrtime := (t.String()[:19])
-	query := fmt.Sprintf("SELECT resource, city, district, start_date, end_date, source_url, notes FROM outages WHERE end_date > '%v';", qrtime)
-	return os.Read(query)
-}
 
 func (os *OutageStore) ValidateDistricts(crawled []outage.Outage) ([]district.District, error) {
 	var err error
@@ -191,7 +193,7 @@ func (o OutageStore) FetchOutages(cfg config.Config, logger *zap.Logger) {
 		}
 		crawled = append(crawled, res...)
 	}
-	invalidDistr, err := o.ValidateDistricts(crawled)
+	invalidDistr, err := o.ValidateDistricts(crawled) //TODO: rework with normalized names
 	if err != nil {
 		logger.Sugar().Warn(err)
 	}
