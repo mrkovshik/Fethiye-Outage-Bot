@@ -9,6 +9,7 @@ import (
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/database"
 	district "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage/postgres"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/subscribtion"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/telegram"
 	"github.com/pressly/goose/v3"
 	"github.com/robfig/cron"
@@ -44,6 +45,7 @@ func main() {
 	}
 	c := cron.New()
 	store := postgres.NewOutageStore(db)
+	subStore := subscribtion.NewSubsribtionStore(db)
 	ds := district.NewDistrictStore(db)
 	err = c.AddFunc(cfg.SchedulerConfig.FetchPeriod, func() { store.FetchOutages(cfg, logger) })
 	if err != nil {
@@ -52,6 +54,6 @@ func main() {
 		)
 	}
 	c.Start()
-	store.FetchOutages(cfg, logger)
-	telegram.BotRunner(ds, store, logger)
+	// store.FetchOutages(cfg, logger)
+	telegram.BotRunner(ds, store, subStore, logger)
 }
