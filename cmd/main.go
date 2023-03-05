@@ -55,5 +55,5 @@ func main() {
 	}
 	c.Start()
 	// store.FetchOutages(cfg, logger)
-	telegram.BotRunner(ds, store, subStore, logger)
+	telegram.BotRunner(ds, store, subStore, logger,cfg)
 }

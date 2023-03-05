@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"bytes"
+	"fmt"
 
 	"os"
 	"regexp"
@@ -11,13 +12,16 @@ import (
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
 	district "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage/postgres"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/subscribtion"
+	"github.com/robfig/cron"
 
 	// "github.com/mrkovshik/Fethiye-Outage-Bot/internal/util"
 	"go.uber.org/zap"
 )
+type stateMap map [int64] userState
 
 type userState struct {
 	previousKeyboard tgbotapi.ReplyKeyboardMarkup
@@ -28,6 +32,15 @@ type userState struct {
 	PickedDistrict   string
 	PickedPeriod     int
 	lastActivityTime time.Time
+}
+
+func (u stateMap)cleanUpMap (c time.Duration){
+	for id,state:= range u{
+		if  time.Now().UTC().Sub(state.lastActivityTime) > c{
+			delete(u,id)
+			fmt.Printf("\nState deleted\n\n")
+		} 
+	}
 }
 
 func (u *userState) goBack() string {
@@ -117,9 +130,18 @@ func (u *userState) processCity() string {
 	return "pickCity_confirm"
 }
 
-func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore *subscribtion.SubscribtionStore, logger *zap.Logger) {
+func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore *subscribtion.SubscribtionStore, logger *zap.Logger, cfg config.Config) {
 	var err error
-	userMap := make(map[int64]userState)
+
+	userMap := stateMap{}
+	c := cron.New()
+	err = c.AddFunc(cfg.SchedulerConfig.StateCleanUpPeriod, func() { userMap.cleanUpMap(time.Duration(cfg.BotConfig.UserStateLifeTime)*time.Minute) })
+	if err != nil {
+		logger.Fatal("Sceduler error",
+			zap.Error(err),
+		)
+	}
+	go c.Start()
 	//mapping the functions for templates
 	dialogTemplate := template.New("dialogTemplate").Funcs(template.FuncMap{
 		"escape": escapeSimbols,
