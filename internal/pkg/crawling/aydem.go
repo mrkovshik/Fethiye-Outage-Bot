@@ -75,6 +75,7 @@ func (oa OutageAydem) ConvertToOutage(ad []AydemData) ([]outage.Outage, error) {
 				o.StartDate = parsedStartDate
 				o.Notes = i.Street
 				o.SourceURL = oa.Url
+				o.Alerted=false
 				nc, err := util.Normalize(o.City)
 				if err != nil {
 					return []outage.Outage{}, err

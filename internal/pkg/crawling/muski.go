@@ -68,6 +68,7 @@ func (om OutageMuski) parseTable(table *goquery.Selection) ([]outage.Outage, err
 				}
 				parsedRow.StartDate = parsedTime.Add(-3 * time.Hour)
 				parsedRow.EndDate = parsedRow.StartDate.Add(parsedRow.Duration)
+				parsedRow.Alerted=false
 			}
 		}
 		if parsedRow.EndDate.UTC().After(time.Now().UTC()) {

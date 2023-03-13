@@ -68,13 +68,6 @@ func (sstr *DistrictStore) Read(query string) ([]District, error) {
 	return qryRes, err
 }
 
-func countRatio(s string, levRatio int) int {
-	res := len(s) * levRatio / 10
-	if res > levRatio {
-		res = levRatio
-	}
-	return res
-}
 
 func (d *DistrictStore) CheckNormMatch(cit string, dis string) (bool, error) {
 	query := fmt.Sprintf("SELECT city, district, city_normalized, district_normalized FROM districts WHERE district_normalized='%v' AND city_normalized='%v';", dis, cit)

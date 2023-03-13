@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"bytes"
+
 	"fmt"
 
 	"os"
@@ -13,15 +14,18 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/config"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/alert"
 	district "github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/district/postgres"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/outage/postgres"
 	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/pkg/subscribtion"
+	"github.com/mrkovshik/Fethiye-Outage-Bot/internal/util"
 	"github.com/robfig/cron"
 
 	// "github.com/mrkovshik/Fethiye-Outage-Bot/internal/util"
 	"go.uber.org/zap"
 )
-type stateMap map [int64] userState
+
+type stateMap map[int64]userState
 
 type userState struct {
 	previousKeyboard tgbotapi.ReplyKeyboardMarkup
@@ -34,33 +38,33 @@ type userState struct {
 	lastActivityTime time.Time
 }
 
-func (u stateMap)cleanUpMap (c time.Duration){
-	for id,state:= range u{
-		if  time.Now().UTC().Sub(state.lastActivityTime) > c{
-			delete(u,id)
+func (u stateMap) cleanUpMap(c time.Duration) {
+	for id, state := range u {
+		if time.Now().UTC().Sub(state.lastActivityTime) > c {
+			delete(u, id)
 			fmt.Printf("\nState deleted\n\n")
-		} 
+		}
 	}
 }
 
 func (u *userState) goBack() string {
 	u.currentContext = u.previousContext
 	u.currentKeyboard = u.previousKeyboard
-	switch{
-	case u.previousContext=="Pick sub city"||u.previousContext=="Pick check city"||u.previousContext=="Subscribtion settings":
-		u.previousContext="menu"
-		u.previousKeyboard=MenuKeyboard
-		case u.previousContext=="Pick sub distr":
-		u.previousContext="Pick sub city"
-		u.previousKeyboard=CityKeyboard
-	case u.previousContext=="Pick check distr":
-		u.previousContext="Pick check city"
-		u.previousKeyboard=CityKeyboard
-	case u.previousContext=="Change location city":
-		u.previousContext="Subscribtion settings"
-		u.previousKeyboard=SettingsKeyboard
+	switch {
+	case u.previousContext == "Pick sub city" || u.previousContext == "Pick check city" || u.previousContext == "Subscribtion settings":
+		u.previousContext = "menu"
+		u.previousKeyboard = MenuKeyboard
+	case u.previousContext == "Pick sub distr":
+		u.previousContext = "Pick sub city"
+		u.previousKeyboard = CityKeyboard
+	case u.previousContext == "Pick check distr":
+		u.previousContext = "Pick check city"
+		u.previousKeyboard = CityKeyboard
+	case u.previousContext == "Change location city":
+		u.previousContext = "Subscribtion settings"
+		u.previousKeyboard = SettingsKeyboard
 	}
-		
+
 	return "go_back"
 }
 
@@ -81,6 +85,37 @@ func escapeSimbols(s string) string {
 	return re.ReplaceAllStringFunc(s, func(match string) string {
 		return "\\" + match
 	})
+}
+
+func sendAlert(a alert.AlertStore, o postgres.OutageStore, bot *tgbotapi.BotAPI, t *template.Template, logger *zap.Logger) {
+	var buffer bytes.Buffer
+	alerts, err := a.GetActiveAlerts()
+	if err != nil {
+		logger.Fatal("", zap.Error(err))
+	}
+	for _, al := range alerts {
+		TheOutage, err := o.GetOutageByID(al.OutageID)
+		if err != nil {
+			logger.Fatal("", zap.Error(err))
+		}
+		if err := t.ExecuteTemplate(&buffer, "alert", TheOutage); err != nil {
+			if err != nil {
+				logger.Fatal("Executing message template error", zap.Error(err))
+			}
+		}
+		msg := tgbotapi.NewMessage(al.ChatID, "")
+		msg.Text = buffer.String()
+		msg.ParseMode = "MarkdownV2" //This parse mode enables format tags in TG
+		if _, err := bot.Send(msg); err != nil {
+			if err != nil {
+				logger.Fatal("Sending message error", zap.Error(err))
+			}
+		}
+		err = a.SetIsSent(al.ID)
+		if err != nil {
+			logger.Fatal("", zap.Error(err))
+		}
+	}
 }
 
 func (u *userState) processCity() string {
@@ -130,18 +165,11 @@ func (u *userState) processCity() string {
 	return "pickCity_confirm"
 }
 
-func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore *subscribtion.SubscribtionStore, logger *zap.Logger, cfg config.Config) {
+func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore *subscribtion.SubscribtionStore, alertStore *alert.AlertStore, logger *zap.Logger, cfg config.Config) {
 	var err error
-
 	userMap := stateMap{}
-	c := cron.New()
-	err = c.AddFunc(cfg.SchedulerConfig.StateCleanUpPeriod, func() { userMap.cleanUpMap(time.Duration(cfg.BotConfig.UserStateLifeTime)*time.Minute) })
-	if err != nil {
-		logger.Fatal("Sceduler error",
-			zap.Error(err),
-		)
-	}
-	go c.Start()
+	//Creating and starting a scheduler instance for stateMap Cleaner
+
 	//mapping the functions for templates
 	dialogTemplate := template.New("dialogTemplate").Funcs(template.FuncMap{
 		"escape": escapeSimbols,
@@ -150,23 +178,30 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 	//parsing the template file
 	t, err := dialogTemplate.ParseFiles("./templates/dialog_templates_eng.tpl")
 	if err != nil {
-		logger.Fatal("Parsing templates error",
-			zap.Error(err),
-		)
+		logger.Fatal("Parsing templates error", zap.Error(err))
 	}
 	// reading the token from envirinment and connecting
 	api := os.Getenv("OUTAGE_TELEGRAM_APITOKEN")
 	bot, err := tgbotapi.NewBotAPI(api)
 	if err != nil {
-		logger.Fatal("Error connecting to telegram API",
-			zap.Error(err),
-		)
+		logger.Fatal("Error connecting to telegram API", zap.Error(err))
+	}
+	c := cron.New()
+	err = c.AddFunc(cfg.SchedulerConfig.StateCleanUpPeriod, func() { userMap.cleanUpMap(time.Duration(cfg.BotConfig.UserStateLifeTime) * time.Minute) })
+	if err != nil {
+		logger.Fatal("Sceduler error", zap.Error(err))
+	}
+	err = c.AddFunc(cfg.SchedulerConfig.AlertSendPeriod, func() { sendAlert(*alertStore, *store, bot, t, logger) })
+	if err != nil {
+		logger.Fatal("Sceduler error", zap.Error(err))
+	}
+	go c.Start()
+	sendAlert(*alertStore, *store, bot, t, logger)
+	if err != nil {
+		logger.Fatal("", zap.Error(err))
 	}
 	bot.Debug = true
-	logger.Info("Authorized ",
-		zap.Any(
-			"account:", bot.Self.UserName),
-	)
+	logger.Info("Authorized ", zap.Any("account:", bot.Self.UserName))
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 	updates := bot.GetUpdatesChan(u)
@@ -175,29 +210,25 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 		if update.Message != nil { // If we got a message
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
+			//Checking out if user has a state in stateMap
 			if _, ok := userMap[update.Message.Chat.ID]; !ok {
 				userMap[update.Message.Chat.ID] = userState{
 					currentContext:   "start",
-					previousContext: "start",
+					previousContext:  "start",
 					lastActivityTime: time.Now().UTC(),
-					currentKeyboard: MenuKeyboard,
+					currentKeyboard:  MenuKeyboard,
 					previousKeyboard: MenuKeyboard,
 				}
-			}			
+			}
 			currentUserState := userMap[update.Message.Chat.ID]
-			currentUserState.lastActivityTime=time.Now().UTC()
+			currentUserState.lastActivityTime = time.Now().UTC()
 			if update.Message.Text == "/start" || update.Message.Text == "/main_menu" {
 				if err := t.ExecuteTemplate(&buffer, "name_greet", update.Message.From); err != nil {
-					logger.Fatal("Executing startMsg template error",
-						zap.Error(err),
-					)
+					logger.Fatal("Executing startMsg template error", zap.Error(err))
 				}
 				if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
-					logger.Fatal("Executing startMsg template error",
-						zap.Error(err),
-					)
+					logger.Fatal("Executing startMsg template error", zap.Error(err))
 				}
-
 			} else {
 				switch {
 				case currentUserState.currentContext == "menu":
@@ -205,60 +236,44 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 					case "Subscribe for alerts":
 						isExist, err := subStore.SubExists(update.Message.Chat.ID)
 						if err != nil {
-							logger.Fatal("",
-								zap.Error(err),
-							)
+							logger.Fatal("", zap.Error(err))
 						}
 						if isExist {
 							if err := t.ExecuteTemplate(&buffer, "have_sub", nil); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
+								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 						} else {
 							if err := t.ExecuteTemplate(&buffer, "pickCity_greet", update.Message.From); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
+								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 							currentUserState.currentContext = "Pick sub city"
 							currentUserState.currentKeyboard = CityKeyboard
 						}
 					case "Check out for outages":
 						if err := t.ExecuteTemplate(&buffer, "pickCity_greet", update.Message.From); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 						currentUserState.currentContext = "Pick check city"
 						currentUserState.currentKeyboard = CityKeyboard
 					case "Subscribtion settings":
 						isExist, err := subStore.SubExists(update.Message.Chat.ID)
 						if err != nil {
-							logger.Fatal("",
-								zap.Error(err),
-							)
+							logger.Fatal("", zap.Error(err))
 						}
 						if !isExist {
 							if err := t.ExecuteTemplate(&buffer, "no_subs", nil); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
+								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 						} else {
 							if err := t.ExecuteTemplate(&buffer, "settings_greet", update.Message.From); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
+								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 							currentUserState.currentContext = "Subscribtion settings"
 							currentUserState.currentKeyboard = SettingsKeyboard
 						}
 					default:
 						if err := t.ExecuteTemplate(&buffer, "claim_buttons", update.Message.From); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 					}
 
@@ -276,9 +291,7 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 					//Checking out if input is valid by searching a match from DB
 					match, err := ds.GetNormFromDB(currentUserState.PickedCity, currentUserState.PickedDistrict)
 					if err != nil {
-						logger.Fatal("",
-							zap.Error(err),
-						)
+						logger.Fatal("", zap.Error(err))
 					}
 					if update.Message.Text == "GO BACK" {
 						if err := t.ExecuteTemplate(&buffer, currentUserState.goBack(), currentUserState); err != nil {
@@ -287,17 +300,13 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 							)
 						}
 						if err := t.ExecuteTemplate(&buffer, "pickCity_greet", update.Message.From); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 					} else {
 						//if input is valid
 						if match.Name != "" {
 							if err := t.ExecuteTemplate(&buffer, "pickDistr_confirm", currentUserState); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
+								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 							switch currentUserState.currentContext {
 							case "Pick sub distr":
@@ -306,61 +315,64 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 								currentUserState.previousKeyboard = currentUserState.currentKeyboard
 								currentUserState.currentKeyboard = HoursKeyboard
 								if err := t.ExecuteTemplate(&buffer, "pickPeriod_greet", currentUserState); err != nil {
-									logger.Fatal("Executing message template error",
-										zap.Error(err),
-									)
+									logger.Fatal("Executing message template error", zap.Error(err))
 								}
 							case "Pick check distr":
 								userOutages, err := store.GetActiveOutagesByCityDistrict(match.NameNormalized, match.CityNormalized)
 								if err != nil {
-									logger.Fatal("",
-										zap.Error(err),
-									)
+									logger.Fatal("", zap.Error(err))
 								}
 								if err := t.ExecuteTemplate(&buffer, "listOutages", userOutages); err != nil {
-									logger.Fatal("Error executing listOutages template",
-										zap.Error(err),
-									)
+									logger.Fatal("Error executing listOutages template", zap.Error(err))
 								}
 								if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), update.Message.From); err != nil {
-									logger.Fatal("Executing startMsg template error",
-										zap.Error(err),
-									)
+									logger.Fatal("Executing startMsg template error", zap.Error(err))
 								}
 							case "Change location distr":
-								s := subscribtion.Subscribtion{
-									City:     currentUserState.PickedCity,
-									District: currentUserState.PickedDistrict,
-									ChatID:   update.Message.Chat.ID,
+								c, err := util.Normalize(currentUserState.PickedCity)
+								if err != nil {
+									logger.Fatal("", zap.Error(err))
 								}
-								err := subStore.ModifyLocation(s)
+								d, err := util.Normalize(currentUserState.PickedDistrict)
+								if err != nil {
+									logger.Fatal("", zap.Error(err))
+								}
+								s := subscribtion.Subscribtion{
+									City:               currentUserState.PickedCity,
+									District:           currentUserState.PickedDistrict,
+									Period:             currentUserState.PickedPeriod,
+									ChatID:             update.Message.Chat.ID,
+									CityNormalized:     strings.Join(c, " "),
+									DistrictNormalized: strings.Join(d, " "),
+								}
+								err = subStore.ModifyLocation(s)
 								if err != nil {
 									if err := t.ExecuteTemplate(&buffer, "error", nil); err != nil {
-										logger.Fatal("Executing message template error",
-											zap.Error(err),
-										)
+										logger.Fatal("Executing message template error", zap.Error(err))
 									}
-									logger.Warn("",
-										zap.Error(err),
-									)
+									logger.Warn("", zap.Error(err))
 								} else {
+									if err := alertStore.CancelByChatID(update.Message.Chat.ID); err != nil {
+										logger.Fatal("", zap.Error(err))
+									}
+									newSub, err := subStore.GetSubsByChatID(update.Message.Chat.ID)
+									if err != nil {
+										logger.Fatal("", zap.Error(err))
+									}
+									if err := alertStore.GenerateAlertsForNewSub(*store, newSub[0]); err != nil {
+										logger.Fatal("", zap.Error(err))
+									}
 									if err := t.ExecuteTemplate(&buffer, "change_location_confirm", nil); err != nil {
-										logger.Fatal("Executing message template error",
-											zap.Error(err),
-										)
+										logger.Fatal("Executing message template error", zap.Error(err))
 									}
 									if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), update.Message.From); err != nil {
-										logger.Fatal("Executing startMsg template error",
-											zap.Error(err),
-										)
+										logger.Fatal("Executing startMsg template error", zap.Error(err))
 									}
 								}
 							}
 						} else {
 							if err := t.ExecuteTemplate(&buffer, "claim_buttons", update.Message.From); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
+								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 						}
 					}
@@ -369,56 +381,58 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 					switch {
 					case update.Message.Text == "GO BACK":
 						if err := t.ExecuteTemplate(&buffer, currentUserState.goBack(), currentUserState); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 						if err := t.ExecuteTemplate(&buffer, "pickCity_confirm", currentUserState); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
-						
 
 					case update.Message.Text == "2 hours" || update.Message.Text == "6 hours" || update.Message.Text == "12 hours" || update.Message.Text == "24 hours":
 						h := strings.TrimSuffix(update.Message.Text, " hours")
 						currentUserState.PickedPeriod, err = strconv.Atoi(h)
 						if err != nil {
-							logger.Fatal("Converting period error",
-								zap.Error(err),
-							)
+							logger.Fatal("Converting period error", zap.Error(err))
+						}
+						c, err := util.Normalize(currentUserState.PickedCity)
+						if err != nil {
+							logger.Fatal("", zap.Error(err))
+						}
+						d, err := util.Normalize(currentUserState.PickedDistrict)
+						if err != nil {
+							logger.Fatal("", zap.Error(err))
 						}
 						s := subscribtion.Subscribtion{
-							City:     currentUserState.PickedCity,
-							District: currentUserState.PickedDistrict,
-							Period:   currentUserState.PickedPeriod,
-							ChatID:   update.Message.Chat.ID,
+							City:               currentUserState.PickedCity,
+							District:           currentUserState.PickedDistrict,
+							Period:             currentUserState.PickedPeriod,
+							ChatID:             update.Message.Chat.ID,
+							CityNormalized:     strings.Join(c, " "),
+							DistrictNormalized: strings.Join(d, " "),
 						}
+
 						if err := subStore.Save(s); err != nil {
 							if err := t.ExecuteTemplate(&buffer, "error", nil); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
+								logger.Fatal("Executing message template error", zap.Error(err))
 							}
-							logger.Warn("",
-								zap.Error(err),
-							)
+							logger.Warn("", zap.Error(err))
 						}
+						newSub, err := subStore.GetSubsByChatID(update.Message.Chat.ID)
+						if err != nil {
+							logger.Fatal("", zap.Error(err))
+						}
+						if err := alertStore.GenerateAlertsForNewSub(*store, newSub[0]); err != nil {
+							logger.Fatal("", zap.Error(err))
+						}
+
 						if err := t.ExecuteTemplate(&buffer, "set_period_confirm", currentUserState); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 						if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 					default:
 						if err := t.ExecuteTemplate(&buffer, "claim_buttons", update.Message.From); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 
 					}
@@ -426,23 +440,17 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 					switch {
 					case update.Message.Text == "GO BACK":
 						if err := t.ExecuteTemplate(&buffer, currentUserState.goBack(), currentUserState); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
-						if err := t.ExecuteTemplate(&buffer, "settings_greet",nil ); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+						if err := t.ExecuteTemplate(&buffer, "settings_greet", nil); err != nil {
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 
 					case update.Message.Text == "2 hours" || update.Message.Text == "6 hours" || update.Message.Text == "12 hours" || update.Message.Text == "24 hours":
 						h := strings.TrimSuffix(update.Message.Text, " hours")
 						currentUserState.PickedPeriod, err = strconv.Atoi(h)
 						if err != nil {
-							logger.Fatal("Converting period error",
-								zap.Error(err),
-							)
+							logger.Fatal("Converting period error", zap.Error(err))
 						}
 						s := subscribtion.Subscribtion{
 							Period: currentUserState.PickedPeriod,
@@ -452,23 +460,25 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 						err := subStore.ModifyPeriod(s)
 						if err != nil {
 							if err := t.ExecuteTemplate(&buffer, "error", nil); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
+								logger.Fatal("Executing message template error", zap.Error(err))
 							}
-							logger.Warn("",
-								zap.Error(err),
-							)
+							logger.Warn("", zap.Error(err))
 						} else {
+							if err := alertStore.CancelByChatID(update.Message.Chat.ID); err != nil {
+								logger.Fatal("", zap.Error(err))
+							}
+							newSub, err := subStore.GetSubsByChatID(update.Message.Chat.ID)
+							if err != nil {
+								logger.Fatal("", zap.Error(err))
+							}
+							if err := alertStore.GenerateAlertsForNewSub(*store, newSub[0]); err != nil {
+								logger.Fatal("", zap.Error(err))
+							}
 							if err := t.ExecuteTemplate(&buffer, "change_period_confirm", currentUserState); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
+								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 							if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
+								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 						}
 					}
@@ -477,44 +487,25 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 					switch update.Message.Text {
 					case "Change location":
 						if err := t.ExecuteTemplate(&buffer, "pickCity_greet", update.Message.From); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 						currentUserState.currentContext = "Change location city"
 						currentUserState.currentKeyboard = CityKeyboard
 						currentUserState.previousContext = "Subscribtion settings"
 						currentUserState.previousKeyboard = SettingsKeyboard
 					case "Cancel subscribtion":
-						s := subscribtion.Subscribtion{
-							ChatID: update.Message.Chat.ID,
+						if err := t.ExecuteTemplate(&buffer, "cancel_you_sure", nil); err != nil {
+							logger.Fatal("Executing message template error", zap.Error(err))
+
 						}
-						if err := subStore.RemoveSubscribtion(s); err != nil {
-							if err := t.ExecuteTemplate(&buffer, "error", nil); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
-							}
-							logger.Warn("",
-								zap.Error(err),
-							)
-						} else {
-							if err := t.ExecuteTemplate(&buffer, "cancel_confirm", nil); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
-							}
-							if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
-							}
-						}
+						currentUserState.currentContext = "Cancel subscribtion confirmed"
+						currentUserState.currentKeyboard = ConfirmKeyboard
+						currentUserState.previousContext = "Subscribtion settings"
+						currentUserState.previousKeyboard = SettingsKeyboard
+
 					case "Change alert period":
 						if err := t.ExecuteTemplate(&buffer, "change_period_greet", nil); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 						currentUserState.currentContext = "Change alert period"
 						currentUserState.currentKeyboard = HoursKeyboard
@@ -525,62 +516,77 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 						subs, err := subStore.GetSubsByChatID(update.Message.Chat.ID)
 						if err != nil {
 							if err := t.ExecuteTemplate(&buffer, "error", nil); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
+								logger.Fatal("Executing message template error", zap.Error(err))
 							}
-							logger.Warn("",
-								zap.Error(err),
-							)
+							logger.Warn("", zap.Error(err))
 						} else {
-
 							if err := t.ExecuteTemplate(&buffer, "show_sub", subs[0]); err != nil {
-								logger.Fatal("Executing message template error",
-									zap.Error(err),
-								)
+								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 						}
 						if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
-
 					case "GO BACK":
 						if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 					default:
 						if err := t.ExecuteTemplate(&buffer, "claim_buttons", update.Message.From); err != nil {
-							logger.Fatal("Executing message template error",
-								zap.Error(err),
-							)
+							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 					}
+				case currentUserState.currentContext == "Cancel subscribtion confirmed":
+					switch update.Message.Text {
+					case "Yes, cancel it":
+						s := subscribtion.Subscribtion{
+							ChatID: update.Message.Chat.ID,
+						}
+						if err := alertStore.CancelByChatID(update.Message.Chat.ID); err != nil {
+							if err := t.ExecuteTemplate(&buffer, "error", nil); err != nil {
+								logger.Fatal("Executing message template error", zap.Error(err))
+							}
+							logger.Warn("", zap.Error(err))
+						} else {
+							if err := subStore.CancelSubscribtion(s); err != nil {
+								if err := t.ExecuteTemplate(&buffer, "error", nil); err != nil {
+									logger.Fatal("Executing message template error", zap.Error(err))
+								}
+								logger.Warn("", zap.Error(err))
+							} else {
+								if err := t.ExecuteTemplate(&buffer, "cancel_confirm", nil); err != nil {
+									logger.Fatal("Executing message template error", zap.Error(err))
+								}
+								if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
+									logger.Fatal("Executing message template error", zap.Error(err))
+								}
+							}
+						}
+					case "No, let's go back":
+						if err := t.ExecuteTemplate(&buffer, currentUserState.goBack(), nil); err != nil {
+							logger.Fatal("Executing message template error", zap.Error(err))
+						}
+					default:
+						if err := t.ExecuteTemplate(&buffer, "claim_buttons", update.Message.From); err != nil {
+							logger.Fatal("Executing message template error", zap.Error(err))
+						}
+					}
+
 				default:
 					if err := t.ExecuteTemplate(&buffer, "press_start", nil); err != nil {
-						logger.Fatal("Executing message template error",
-							zap.Error(err),
-						)
+						logger.Fatal("Executing message template error", zap.Error(err))
 					}
 					if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
-						logger.Fatal("Executing message template error",
-							zap.Error(err),
-						)
+						logger.Fatal("Executing message template error", zap.Error(err))
 					}
 				}
 			}
 			userMap[update.Message.Chat.ID] = currentUserState
 			msg.ReplyMarkup = currentUserState.currentKeyboard
-
 			msg.Text = buffer.String()
 			msg.ParseMode = "MarkdownV2" //This parse mode enables format tags in TG
 			if _, err := bot.Send(msg); err != nil {
-				logger.Fatal("Error sending message",
-					zap.Error(err),
-				)
+				logger.Fatal("Error sending message", zap.Error(err))
 			}
 		}
 	}

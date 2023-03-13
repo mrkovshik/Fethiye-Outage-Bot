@@ -3,6 +3,7 @@ package outage
 import "time"
 
 type Outage struct {
+	ID                 string
 	Resource           string
 	City               string
 	District           string
@@ -13,6 +14,7 @@ type Outage struct {
 	SourceURL          string
 	CityNormalized     string
 	DistrictNormalized string
+	Alerted            bool
 }
 
 func (one Outage) Equal(another Outage) bool {

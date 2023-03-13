@@ -23,7 +23,8 @@ botconfig:
 
 schedulerconfig:
   fetch_period: '@every 30m'
-  map_clean_period: '@every 1m'
+  map_clean_period: '@every 12h'
+  alert_send_period: '@every 10m'
 
 loggerconfig:
   level: debug

@@ -26,6 +26,13 @@ var MenuKeyboard = tgbotapi.NewReplyKeyboard(
 	
 )
 
+var ConfirmKeyboard = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yes, cancel it"),
+		tgbotapi.NewKeyboardButton("No, let's go back"),
+	),
+)
+
 var SettingsKeyboard = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Change location"),

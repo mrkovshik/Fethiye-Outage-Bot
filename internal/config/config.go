@@ -53,6 +53,7 @@ type CrawlersURL struct {
 type SchedulerConfig struct {
 	FetchPeriod        string `yaml:"fetch_period"`
 	StateCleanUpPeriod string `yaml:"map_clean_period"`
+	AlertSendPeriod    string `yaml:"alert_send_period"`
 }
 
 type BotConfig struct {
