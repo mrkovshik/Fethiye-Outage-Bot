@@ -187,7 +187,7 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 		logger.Fatal("Error connecting to telegram API", zap.Error(err))
 	}
 	c := cron.New()
-	err = c.AddFunc(cfg.SchedulerConfig.StateCleanUpPeriod, func() { userMap.cleanUpMap(time.Duration(cfg.BotConfig.UserStateLifeTime) * time.Minute) })
+	err = c.AddFunc(cfg.SchedulerConfig.StateCleanUpPeriod, func() { userMap.cleanUpMap(time.Duration(cfg.BotConfig.UserStateLifeTime) * time.Hour) })
 	if err != nil {
 		logger.Fatal("Sceduler error", zap.Error(err))
 	}

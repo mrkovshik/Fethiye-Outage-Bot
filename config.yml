@@ -18,7 +18,7 @@ crawlersurl:
   aydem: https://www.admelektrik.com.tr/assets/js/data/ADM/outages.json
 
 botconfig:
-  user_state_life_time: 1
+  user_state_life_time: 12
 
 
 schedulerconfig:
