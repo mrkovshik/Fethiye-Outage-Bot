@@ -18,5 +18,6 @@ district_normalized = lower (normalize(regexp_replace(unaccent(district), '[^a-z
 DROP EXTENSION IF EXISTS "pg_trgm",
 DROP EXTENSION IF EXISTS "unaccent";
 
+ALTER TABLE outages 
 DROP column IF EXISTS city_normalized,
-DROP column IF EXISTS district_normalized,
+DROP column IF EXISTS district_normalized;

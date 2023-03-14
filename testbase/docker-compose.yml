@@ -3,11 +3,11 @@ version: '3.1'
 services:
 
   db:
-    container_name: outage_db2
+    container_name: outage_db3
     image: postgres
     restart: always 
     ports:
-      - 5432:5432
+      - 5433:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

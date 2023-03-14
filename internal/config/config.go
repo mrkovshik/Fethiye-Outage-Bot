@@ -50,13 +50,14 @@ type CrawlersURL struct {
 	Aydem string `yaml:"aydem"`
 }
 
-type SearchConfig struct {
-	LevRatio string `yaml:"levratio"`
-	SimRatio string `yaml:"simratio"`
+type SchedulerConfig struct {
+	FetchPeriod        string `yaml:"fetch_period"`
+	StateCleanUpPeriod string `yaml:"map_clean_period"`
+	AlertSendPeriod    string `yaml:"alert_send_period"`
 }
 
-type SchedulerConfig struct {
-	FetchPeriod string `yaml:"fetch_period"`
+type BotConfig struct {
+	UserStateLifeTime int `yaml:"user_state_life_time"`
 }
 
 // Project - contains all parameters project information.
@@ -73,9 +74,9 @@ type Config struct {
 	Project         Project         `yaml:"project"`
 	Database        Database        `yaml:"database"`
 	CrawlersURL     CrawlersURL     `yaml:"crawlersurl"`
-	SearchConfig    SearchConfig    `yaml:"searchconfig"`
 	SchedulerConfig SchedulerConfig `yaml:"schedulerconfig"`
 	LoggerConfig    zap.Config      `yaml:"loggerconfig"`
+	BotConfig       BotConfig       `yaml:"botconfig"`
 }
 
 // ReadConfigYML - read configurations from file and init instance Config.

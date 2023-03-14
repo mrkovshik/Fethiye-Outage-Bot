@@ -14,6 +14,7 @@ import (
 )
 
 type outageRow struct {
+	ID                 string    `db:"id"`
 	Resource           string    `db:"resource"`
 	City               string    `db:"city"`
 	District           string    `db:"district"`
@@ -24,6 +25,7 @@ type outageRow struct {
 	DateAdded          time.Time `db:"date_added"`
 	CityNormalized     string    `db:"city_normalized"`
 	DistrictNormalized string    `db:"district_normalized"`
+	Alerted            bool      `db:"alerted"`
 	// UpdatedAt  sql.NullTime `db:"updated_at"`
 	// TODO if changed?
 	// Add enabled or processed
@@ -31,16 +33,17 @@ type outageRow struct {
 
 func (from *outageRow) marshal() outage.Outage {
 	return outage.Outage{
-		Resource:  from.Resource,
-		City:      from.City,
-		District:  from.District,
-		StartDate: from.StartDate,
-		EndDate:   from.EndDate,
-		SourceURL: from.SourceURL,
-		Notes:     from.Notes,
-		CityNormalized: from.CityNormalized,
+		ID:                 from.ID,
+		Resource:           from.Resource,
+		City:               from.City,
+		District:           from.District,
+		StartDate:          from.StartDate,
+		EndDate:            from.EndDate,
+		SourceURL:          from.SourceURL,
+		Notes:              from.Notes,
+		CityNormalized:     from.CityNormalized,
 		DistrictNormalized: from.DistrictNormalized,
-
+		Alerted:            from.Alerted,
 	}
 }
 
@@ -49,16 +52,17 @@ func (or *outageRow) unmarshal(from outage.Outage) error {
 		return errors.New("Start date is after End date")
 	}
 	*or = outageRow{
-		Resource:  from.Resource,
-		City:      from.City,
-		District:  from.District,
-		StartDate: from.StartDate,
-		EndDate:   from.EndDate,
-		SourceURL: from.SourceURL,
-		Notes:     from.Notes,
-		DateAdded: time.Now().UTC(),
-		CityNormalized: from.CityNormalized,
+		Resource:           from.Resource,
+		City:               from.City,
+		District:           from.District,
+		StartDate:          from.StartDate,
+		EndDate:            from.EndDate,
+		SourceURL:          from.SourceURL,
+		Notes:              from.Notes,
+		DateAdded:          time.Now().UTC(),
+		CityNormalized:     from.CityNormalized,
 		DistrictNormalized: from.DistrictNormalized,
+		Alerted:            from.Alerted,
 	}
 	return nil
 }
@@ -79,10 +83,24 @@ func NewOutageStore(db *sqlx.DB) *OutageStore {
 	}
 }
 
+func (os *OutageStore) SetAlerted(o outage.Outage) error {
+	query := fmt.Sprintf(`UPDATE outages set alerted=true where id='%v';`, o.ID)
+	var orow outageRow
+		err := orow.unmarshal(o)
+		if err != nil {
+			return err
+		}
+		if _, err := os.db.Query(query); err != nil {
+			return errors.Wrap(err, "Error updating table")
+		}
+	return nil
+
+}
+
 func (os *OutageStore) Save(o []outage.Outage) error {
 	// TODO from Columns
-	query := `INSERT INTO outages (resource, city, city_normalized, district, district_normalized, start_date, end_date, source_url, notes, date_added)
-  			VALUES (:resource, :city, :city_normalized, :district, :district_normalized, :start_date, :end_date, :source_url, :notes, :date_added);`
+	query := `INSERT INTO outages (resource, city, city_normalized, district, district_normalized, start_date, end_date, source_url, notes, date_added, alerted)
+  			VALUES (:resource, :city, :city_normalized, :district, :district_normalized, :start_date, :end_date, :source_url, :notes, :date_added, :alerted);`
 
 	var orow outageRow
 	for _, i := range o {
@@ -108,7 +126,7 @@ func (os *OutageStore) Read(query string) ([]outage.Outage, error) {
 	qryRes := make([]outage.Outage, 0)
 	for rows.Next() {
 		var o = outageRow{}
-		if err := rows.Scan(&o.Resource, &o.City, &o.District, &o.CityNormalized, &o.DistrictNormalized, &o.StartDate, &o.EndDate, &o.SourceURL, &o.Notes); err != nil {
+		if err := rows.Scan(&o.ID, &o.Resource, &o.City, &o.District, &o.CityNormalized, &o.DistrictNormalized, &o.StartDate, &o.EndDate, &o.SourceURL, &o.Notes); err != nil {
 			err = errors.Wrap(err, "Failed to scan row:")
 			return []outage.Outage{}, err
 		}
@@ -123,23 +141,36 @@ func (os *OutageStore) Read(query string) ([]outage.Outage, error) {
 
 func (os *OutageStore) GetActiveOutagesByCityDistrict(distr string, city string) ([]outage.Outage, error) {
 	qrtime := time.Now().UTC().String()[:19]
-	query := fmt.Sprintf("SELECT resource, city, district, city_normalized, district_normalized, start_date, end_date, source_url, notes	FROM outages WHERE district_normalized='%v' AND city_normalized='%v' AND end_date > '%v';", distr, city, qrtime)
+
+	query := fmt.Sprintf("SELECT id, resource, city, district, city_normalized, district_normalized, start_date, end_date, source_url, notes	FROM outages WHERE district_normalized='%v' AND city_normalized='%v' AND end_date > '%v';", distr, city, qrtime)
 	return os.Read(query)
 }
 
 func (os *OutageStore) GetAllActiveOutages() ([]outage.Outage, error) {
 	qrtime := time.Now().UTC().String()[:19]
-	query := fmt.Sprintf("SELECT resource, city, district, city_normalized, district_normalized, start_date, end_date, source_url, notes	FROM outages WHERE end_date > '%v';", qrtime)
+	query := fmt.Sprintf("SELECT id, resource, city, district, city_normalized, district_normalized, start_date, end_date, source_url, notes	FROM outages WHERE end_date > '%v';", qrtime)
 	return os.Read(query)
 }
 
+func (os *OutageStore) GetOutageByID(id string) (outage.Outage, error) {
+	query := fmt.Sprintf("SELECT id, resource, city, district, city_normalized, district_normalized, start_date, end_date, source_url, notes	FROM outages WHERE id = '%v';", id)
+	o, err:=os.Read(query)
+	
+	return o[0],err
+}
+
+func (os *OutageStore) GetAllActiveUnalertedOutages() ([]outage.Outage, error) {
+	qrtime := time.Now().UTC().String()[:19]
+	query := fmt.Sprintf("SELECT id, resource, city, district, city_normalized, district_normalized, start_date, end_date, source_url, notes	FROM outages WHERE end_date > '%v' AND alerted=false;", qrtime)
+	return os.Read(query)
+}
 
 func (os *OutageStore) ValidateDistricts(crawled []outage.Outage) ([]district.District, error) {
 	var err error
 	unValidated := make([]district.District, 0)
 	ds := district.NewDistrictStore(os.db)
 	for _, i := range crawled {
-		ok, err := ds.CheckStrictMatch(i.CityNormalized, i.DistrictNormalized)
+		ok, err := ds.CheckNormMatch(i.CityNormalized, i.DistrictNormalized)
 		if err != nil {
 			err = errors.Wrap(err, "Failed to validate:")
 			return []district.District{}, err
@@ -199,7 +230,7 @@ func (o OutageStore) FetchOutages(cfg config.Config, logger *zap.Logger) {
 		}
 		crawled = append(crawled, res...)
 	}
-	invalidDistr, err := o.ValidateDistricts(crawled) 
+	invalidDistr, err := o.ValidateDistricts(crawled)
 	if err != nil {
 		logger.Sugar().Warn(err)
 	}

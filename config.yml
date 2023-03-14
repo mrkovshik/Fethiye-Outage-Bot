@@ -17,15 +17,14 @@ crawlersurl:
   muski: https://www.muski.gov.tr/
   aydem: https://www.admelektrik.com.tr/assets/js/data/ADM/outages.json
 
-searchconfig:
-  simratio: 0.4
-  # this ratio represents levenstein distance for the fuzzy search
-  # for the words with length >= 10. it decreases lineary to 0
-  #  for the words with length <10 
-  levratio: 3 
+botconfig:
+  user_state_life_time: 1
+
 
 schedulerconfig:
   fetch_period: '@every 30m'
+  map_clean_period: '@every 12h'
+  alert_send_period: '@every 10m'
 
 loggerconfig:
   level: debug
