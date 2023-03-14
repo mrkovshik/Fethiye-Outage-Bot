@@ -1,20 +1,19 @@
 {{define "listOutages"}}
 {{if eq (len .) 0 }}
-    *There is no outages planned in your neighborhood in the closest time*
+    *There are no outages planned in your neighborhood in the nearest future*
 {{else}}
-*Here are the closest outages found for your neighborhood:*
+*Here are the planned outages found for your neighborhood:*
 {{range .}}
 *{{.Resource}} outage* from {{escape (format (.StartDate))}} to {{escape (format (.EndDate))}}{{if gt (len .Notes ) 3 }}
-*In the next areas and streets:*
+*In the following areas and streets:*
 {{escape (.Notes)}}{{end}}
 {{end}}
 {{end}}
 {{end}}
 
 {{define "alert"}}
-Please be aware that there is a *{{.Resource}} outage* planned in *{{.District}} {{.City}}* from
-{{escape (format (.StartDate))}} to {{escape (format (.EndDate))}}{{if gt (len .Notes ) 3 }}
-*In the next areas and streets:*
+Please be aware that there is a *{{.Resource}} outage* planned in *{{.District}} {{.City}}* from {{escape (format (.StartDate))}} to {{escape (format (.EndDate))}}{{if gt (len .Notes ) 3 }}
+*In the following areas and streets:*
 {{escape (.Notes)}}{{end}}
 {{end}}
 
@@ -24,7 +23,7 @@ Hi {{escape (.UserName)}}{{escape ("!")}}
 {{end}}
 
 {{define "mainMenu_greet"}}
-What do you want to do?
+What would you like to do?
 {{end}}
 
 {{define "pickCity_greet"}}
@@ -32,7 +31,7 @@ Please, pick your city from the list below:
 {{end}}
 
 {{define "settings_greet"}}
-You can modify your subscribtions here{{escape (".")}} What would you like to change?
+You can modify your subscriptions here{{escape (".")}} What would you like to change?
 {{end}}
 
 {{define "claim_buttons"}}
@@ -44,7 +43,7 @@ You have chosen *{{.PickedCity}}* city{{escape ("!")}} Now pick your neighborhoo
 {{end}}
 
 {{define "pickPeriod_greet"}}
-Now pick alert period:
+Now pick the alert period:
 {{end}}
 
 {{define "change_period_greet"}}
@@ -56,40 +55,35 @@ You have chosen *{{.PickedDistrict}}* neighborhood in *{{.PickedCity}}* city{{es
 {{end}}
 
 {{define "change_location_confirm"}}
-Your subscribtion has been sucsessfully updated{{escape ("!")}}
+Your subscription has been sucsessfully updated{{escape ("!")}}
 {{end}}
 
 {{define "change_period_confirm"}}
-Your subscribe has been sucsessfully updated{{escape ("!")}} From now on you will get notifications about outages in
-your neighborhood in *{{.PickedPeriod}}* hours before it starts{{escape (".")}}
+Your subscription has been sucsessfully updated{{escape ("!")}} From now on you will get notifications about outages in your neighborhood in *{{.PickedPeriod}}* hours before it starts{{escape (".")}}
 {{end}}
 
 {{define "set_period_confirm"}}
-Your subscribe has been sucsessfully set{{escape ("!")}} From now on you will get notifications about outages in
-*{{.PickedDistrict}}* *{{.PickedCity}}* in *{{.PickedPeriod}}* hours before it starts{{escape (".")}}
+Your subscription has been sucsessfully set{{escape ("!")}} From now on you will get notifications about outages in *{{.PickedDistrict}}* *{{.PickedCity}}* in *{{.PickedPeriod}}* hours before it starts{{escape (".")}}
 {{end}}
 
 {{define "show_sub"}}
-You are subscribed to get notifications about outages in *{{.District}}* neighborhood in *{{.City}}* city in
-*{{.Period}}* hours before it starts{{escape (".")}}
+You are subscribed to get notifications about outages in *{{.District}}* neighborhood in *{{.City}}* city in *{{.Period}}* hours before it starts{{escape (".")}}
 {{end}}
 
 {{define "no_subs"}}
-It seems like you do not have a subscribtion yet{{escape (".")}} Pick *Subscribe for alerts* button to get
-one{{escape (".")}}
+It seems you do not have a subscription yet{{escape (".")}} Pick *Subscribe for alerts* button to get one{{escape (".")}}
 {{end}}
 
 {{define "have_sub"}}
-It seems like you already have a subscribtion{{escape (".")}} Pick *Subscribtion settings* button to modify or cancel
-your subscribtion{{escape (".")}}
+It seems you already have a subscription{{escape (".")}} Pick *Subscription settings* button to modify or cancel your subscription{{escape (".")}}
 {{end}}
 
 {{define "cancel_confirm"}}
-Your subscribtion has been sucsessfully cancelled{{escape ("!")}}
+Your subscription has been sucsessfully cancelled{{escape ("!")}}
 {{end}}
 
 {{define "cancel_you_sure"}}
-Are you sure you want to cancel your subscribtion{{escape ("?")}}
+Are you sure you want to cancel your subscription{{escape ("?")}}
 {{end}}
 
 {{define "go_back"}}
@@ -97,11 +91,10 @@ All right, let{{escape ("'")}}s go back to the previous step
 {{end}}
 
 {{define "press_start"}}
-I am sorry, it seems like I forgot what we were talking about{{escape ("(")}}
-Lets make it from the very start{{escape ("!")}}
+I am sorry, I am afraid I forgot what we were talking about{{escape ("(")}}
+Let{{escape ("'")}}s start from the very beginning{{escape ("!")}}
 {{end}}
 
 {{define "error"}}
-OOOPS{{escape ("!")}} We are very sorry, but it seems like something went wrong{{escape (".")}} Please try again
-later{{escape (".")}}
+OOOPS{{escape ("!")}} We are very sorry, but it looks like something went wrong{{escape (".")}} Please try again later{{escape (".")}}
 {{end}}

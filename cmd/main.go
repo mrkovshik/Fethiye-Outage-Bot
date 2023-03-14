@@ -62,6 +62,6 @@ func main() {
 			zap.Error(err),
 		)
 	}
-	// store.FetchOutages(cfg, logger)
+	store.FetchOutages(cfg, logger)
 	telegram.BotRunner(ds, store, subStore, alertStore, logger, cfg)
 }

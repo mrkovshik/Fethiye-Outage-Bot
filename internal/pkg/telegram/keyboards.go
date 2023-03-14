@@ -21,7 +21,7 @@ var MenuKeyboard = tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButton("Check out for outages"),
 	),
 	tgbotapi.NewKeyboardButtonRow(
-		tgbotapi.NewKeyboardButton("Subscribtion settings"),
+		tgbotapi.NewKeyboardButton("Subscription settings"),
 	),
 	
 )
@@ -39,8 +39,8 @@ var SettingsKeyboard = tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButton("Change alert period"),
 	),
 	tgbotapi.NewKeyboardButtonRow(
-		tgbotapi.NewKeyboardButton("Cancel subscribtion"),
-		tgbotapi.NewKeyboardButton("View current subscribtion"),
+		tgbotapi.NewKeyboardButton("Cancel subscription"),
+		tgbotapi.NewKeyboardButton("View current subscription"),
 	),
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("GO BACK"),

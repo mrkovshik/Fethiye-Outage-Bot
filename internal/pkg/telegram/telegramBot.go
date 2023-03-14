@@ -255,7 +255,7 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 						}
 						currentUserState.currentContext = "Pick check city"
 						currentUserState.currentKeyboard = CityKeyboard
-					case "Subscribtion settings":
+					case "Subscription settings":
 						isExist, err := subStore.SubExists(update.Message.Chat.ID)
 						if err != nil {
 							logger.Fatal("", zap.Error(err))
@@ -493,7 +493,7 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 						currentUserState.currentKeyboard = CityKeyboard
 						currentUserState.previousContext = "Subscribtion settings"
 						currentUserState.previousKeyboard = SettingsKeyboard
-					case "Cancel subscribtion":
+					case "Cancel subscription":
 						if err := t.ExecuteTemplate(&buffer, "cancel_you_sure", nil); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 
@@ -512,7 +512,7 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 						currentUserState.previousContext = "Subscribtion settings"
 						currentUserState.previousKeyboard = SettingsKeyboard
 
-					case "View current subscribtion":
+					case "View current subscription":
 						subs, err := subStore.GetSubsByChatID(update.Message.Chat.ID)
 						if err != nil {
 							if err := t.ExecuteTemplate(&buffer, "error", nil); err != nil {
