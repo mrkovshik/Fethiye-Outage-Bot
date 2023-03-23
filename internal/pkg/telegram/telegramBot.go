@@ -36,6 +36,7 @@ type userState struct {
 	PickedDistrict   string
 	PickedPeriod     int
 	lastActivityTime time.Time
+	CurrentLanguage  LanguagePack
 }
 
 func (u stateMap) cleanUpMap(c time.Duration) {
@@ -47,32 +48,32 @@ func (u stateMap) cleanUpMap(c time.Duration) {
 	}
 }
 
-func (u *userState) goBack() string {
+func (u *userState) goBack(l LanguagePack) string {
 	u.currentContext = u.previousContext
 	u.currentKeyboard = u.previousKeyboard
 	switch {
 	case u.previousContext == "Pick sub city" || u.previousContext == "Pick check city" || u.previousContext == "Subscribtion settings":
 		u.previousContext = "menu"
-		u.previousKeyboard = MenuKeyboard
+		u.previousKeyboard = l.MenuKeyboard
 	case u.previousContext == "Pick sub distr":
 		u.previousContext = "Pick sub city"
-		u.previousKeyboard = CityKeyboard
+		u.previousKeyboard = l.CityKeyboard
 	case u.previousContext == "Pick check distr":
 		u.previousContext = "Pick check city"
-		u.previousKeyboard = CityKeyboard
+		u.previousKeyboard = l.CityKeyboard
 	case u.previousContext == "Change location city":
 		u.previousContext = "Subscribtion settings"
-		u.previousKeyboard = SettingsKeyboard
+		u.previousKeyboard = l.SettingsKeyboard
 	}
 
 	return "go_back"
 }
 
-func (u *userState) toMain() string {
+func (u *userState) toMain(l LanguagePack) string {
 	u.previousContext = "menu"
 	u.currentContext = "menu"
-	u.previousKeyboard = MenuKeyboard
-	u.currentKeyboard = MenuKeyboard
+	u.previousKeyboard = l.MenuKeyboard
+	u.currentKeyboard = l.MenuKeyboard
 	return "mainMenu_greet"
 }
 
@@ -87,7 +88,7 @@ func escapeSimbols(s string) string {
 	})
 }
 
-func sendAlert(a alert.AlertStore, o postgres.OutageStore, bot *tgbotapi.BotAPI, t *template.Template, logger *zap.Logger) {
+func sendAlert(a alert.AlertStore, o postgres.OutageStore, bot *tgbotapi.BotAPI, t *template.Template, logger *zap.Logger, l LanguagePack) {
 	var buffer bytes.Buffer
 	alerts, err := a.GetActiveAlerts()
 	if err != nil {
@@ -98,7 +99,7 @@ func sendAlert(a alert.AlertStore, o postgres.OutageStore, bot *tgbotapi.BotAPI,
 		if err != nil {
 			logger.Fatal("", zap.Error(err))
 		}
-		if err := t.ExecuteTemplate(&buffer, "alert", TheOutage); err != nil {
+		if err := l.Template.ExecuteTemplate(&buffer, "alert", TheOutage); err != nil {
 			if err != nil {
 				logger.Fatal("Executing message template error", zap.Error(err))
 			}
@@ -118,42 +119,46 @@ func sendAlert(a alert.AlertStore, o postgres.OutageStore, bot *tgbotapi.BotAPI,
 	}
 }
 
-func (u *userState) processCity() string {
+func (u *userState) processCity(l LanguagePack) string {
 
 	switch u.PickedCity {
 	case "Bodrum":
-		u.currentKeyboard = BodrumKeyboard
+		u.currentKeyboard = l.BodrumKeyboard
 	case "Dalaman":
-		u.currentKeyboard = DalamanKeyboard
+		u.currentKeyboard = l.DalamanKeyboard
 	case "Datça":
-		u.currentKeyboard = DatcaKeyboard
+		u.currentKeyboard = l.DatcaKeyboard
 	case "Fethiye":
-		u.currentKeyboard = FethiyeKeyboard
+		u.currentKeyboard = l.FethiyeKeyboard
 	case "Kavaklıdere":
-		u.currentKeyboard = KavaklidereKeyboard
+		u.currentKeyboard = l.KavaklidereKeyboard
 	case "Köyceğiz":
-		u.currentKeyboard = KoycegizKeyboard
+		u.currentKeyboard = l.KoycegizKeyboard
 	case "Marmaris":
-		u.currentKeyboard = MarmarisKeyboard
+		u.currentKeyboard = l.MarmarisKeyboard
 	case "Menteşe":
-		u.currentKeyboard = MenteseKeyboard
+		u.currentKeyboard = l.MenteseKeyboard
 	case "Milas":
-		u.currentKeyboard = MilasKeyboard
+		u.currentKeyboard = l.MilasKeyboard
 	case "Ortaca":
-		u.currentKeyboard = OrtacaKeyboard
+		u.currentKeyboard = l.OrtacaKeyboard
 	case "Seydikemer":
-		u.currentKeyboard = SeydikemerKeyboard
+		u.currentKeyboard = l.SeydikemerKeyboard
 	case "Ula":
-		u.currentKeyboard = UlaKeyboard
+		u.currentKeyboard = l.UlaKeyboard
 	case "Yatağan":
-		u.currentKeyboard = YataganKeyboard
+		u.currentKeyboard = l.YataganKeyboard
 	case "GO BACK":
-		return u.goBack()
+		return u.goBack(l)
+	case "НАЗАД":
+		return u.goBack(l)
+	case "GERI":
+		return u.goBack(l)
 	default:
 		return "claim_buttons"
 	}
 	u.previousContext = u.currentContext
-	u.previousKeyboard = CityKeyboard
+	u.previousKeyboard = l.CityKeyboard
 	switch u.currentContext {
 	case "Pick sub city":
 		u.currentContext = "Pick sub distr"
@@ -168,18 +173,11 @@ func (u *userState) processCity() string {
 func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore *subscribtion.SubscribtionStore, alertStore *alert.AlertStore, logger *zap.Logger, cfg config.Config) {
 	var err error
 	userMap := stateMap{}
-	//Creating and starting a scheduler instance for stateMap Cleaner
-
-	//mapping the functions for templates
-	dialogTemplate := template.New("dialogTemplate").Funcs(template.FuncMap{
-		"escape": escapeSimbols,
-		"format": formatDateAndMakeLocal,
-	})
-	//parsing the template file
-	t, err := dialogTemplate.ParseFiles("./templates/dialog_templates_eng.tpl")
+	Langs, err := NewLanguages()
 	if err != nil {
-		logger.Fatal("Parsing templates error", zap.Error(err))
+		logger.Fatal("", zap.Error(err))
 	}
+	// CurrentLanguage := Langs.Eng
 	// reading the token from envirinment and connecting
 	api := os.Getenv("OUTAGE_TELEGRAM_APITOKEN")
 	bot, err := tgbotapi.NewBotAPI(api)
@@ -191,12 +189,12 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 	if err != nil {
 		logger.Fatal("Sceduler error", zap.Error(err))
 	}
-	err = c.AddFunc(cfg.SchedulerConfig.AlertSendPeriod, func() { sendAlert(*alertStore, *store, bot, t, logger) })
+	err = c.AddFunc(cfg.SchedulerConfig.AlertSendPeriod, func() { sendAlert(*alertStore, *store, bot, Langs.Eng.Template, logger, Langs.Eng) })
 	if err != nil {
 		logger.Fatal("Sceduler error", zap.Error(err))
 	}
 	go c.Start()
-	sendAlert(*alertStore, *store, bot, t, logger)
+	sendAlert(*alertStore, *store, bot, Langs.Eng.Template, logger, Langs.Eng)
 	if err != nil {
 		logger.Fatal("", zap.Error(err))
 	}
@@ -216,71 +214,116 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 					currentContext:   "start",
 					previousContext:  "start",
 					lastActivityTime: time.Now().UTC(),
-					currentKeyboard:  MenuKeyboard,
-					previousKeyboard: MenuKeyboard,
+					currentKeyboard:  Langs.Eng.MenuKeyboard,
+					previousKeyboard: Langs.Eng.MenuKeyboard,
+					CurrentLanguage:  Langs.Eng,
 				}
 			}
 			currentUserState := userMap[update.Message.Chat.ID]
 			currentUserState.lastActivityTime = time.Now().UTC()
 			if update.Message.Text == "/start" || update.Message.Text == "/main_menu" {
-				if err := t.ExecuteTemplate(&buffer, "name_greet", update.Message.From); err != nil {
+				if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "name_greet", update.Message.From); err != nil {
 					logger.Fatal("Executing startMsg template error", zap.Error(err))
 				}
-				if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
+				if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.toMain(currentUserState.CurrentLanguage), nil); err != nil {
 					logger.Fatal("Executing startMsg template error", zap.Error(err))
 				}
 			} else {
 				switch {
 				case currentUserState.currentContext == "menu":
-					switch update.Message.Text {
-					case "Subscribe for alerts":
+					switch {
+					case update.Message.Text == "Subscribe for alerts" || update.Message.Text == "Подписаться на оповещения" || update.Message.Text == "Uyarılara abone ol":
 						isExist, err := subStore.SubExists(update.Message.Chat.ID)
 						if err != nil {
 							logger.Fatal("", zap.Error(err))
 						}
 						if isExist {
-							if err := t.ExecuteTemplate(&buffer, "have_sub", nil); err != nil {
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "have_sub", nil); err != nil {
 								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 						} else {
-							if err := t.ExecuteTemplate(&buffer, "pickCity_greet", update.Message.From); err != nil {
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "pickCity_greet", update.Message.From); err != nil {
 								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 							currentUserState.currentContext = "Pick sub city"
-							currentUserState.currentKeyboard = CityKeyboard
+							currentUserState.currentKeyboard = currentUserState.CurrentLanguage.CityKeyboard
 						}
-					case "Check out for outages":
-						if err := t.ExecuteTemplate(&buffer, "pickCity_greet", update.Message.From); err != nil {
+					case update.Message.Text == "Check out for outages" || update.Message.Text == "Проверить отключения" || update.Message.Text == "Kapatmaları kontrol et":
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "pickCity_greet", update.Message.From); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 						currentUserState.currentContext = "Pick check city"
-						currentUserState.currentKeyboard = CityKeyboard
-					case "Subscription settings":
+						currentUserState.currentKeyboard = currentUserState.CurrentLanguage.CityKeyboard
+					case update.Message.Text == "Subscription settings" || update.Message.Text == "Настройки оповещений" || update.Message.Text == "Uyarı ayarları":
 						isExist, err := subStore.SubExists(update.Message.Chat.ID)
 						if err != nil {
 							logger.Fatal("", zap.Error(err))
 						}
 						if !isExist {
-							if err := t.ExecuteTemplate(&buffer, "no_subs", nil); err != nil {
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "no_subs", nil); err != nil {
 								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 						} else {
-							if err := t.ExecuteTemplate(&buffer, "settings_greet", update.Message.From); err != nil {
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "settings_greet", nil); err != nil {
 								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 							currentUserState.currentContext = "Subscribtion settings"
-							currentUserState.currentKeyboard = SettingsKeyboard
+							currentUserState.currentKeyboard = currentUserState.CurrentLanguage.SettingsKeyboard
 						}
-					default:
-						if err := t.ExecuteTemplate(&buffer, "claim_buttons", update.Message.From); err != nil {
+					case update.Message.Text == "Рус/Eng/Tür":
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "change_language", nil); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
+						}
+						currentUserState.currentContext = "Language change"
+						currentUserState.currentKeyboard = currentUserState.CurrentLanguage.LanguageKeyboard
+
+					default:
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "claim_buttons", nil); err != nil {
+							logger.Fatal("Executing message template error", zap.Error(err))
+						}
+					}
+				case currentUserState.currentContext == "Language change":
+					if update.Message.Text == "НАЗАД" || update.Message.Text == "GO BACK" || update.Message.Text == "GERI" {
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.toMain(currentUserState.CurrentLanguage), nil); err != nil {
+							logger.Fatal("Executing message template error", zap.Error(err))
+						}
+					} else {
+						switch update.Message.Text {
+						case "English":
+							currentUserState.CurrentLanguage = Langs.Eng
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "change_language_confirm", nil); err != nil {
+								logger.Fatal("Executing message template error", zap.Error(err))
+							}
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.toMain(currentUserState.CurrentLanguage), nil); err != nil {
+								logger.Fatal("Executing message template error", zap.Error(err))
+							}
+						case "Русский":
+							currentUserState.CurrentLanguage = Langs.Rus
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "change_language_confirm", nil); err != nil {
+								logger.Fatal("Executing message template error", zap.Error(err))
+							}
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.toMain(currentUserState.CurrentLanguage), nil); err != nil {
+								logger.Fatal("Executing message template error", zap.Error(err))
+							}
+						case "Türkçe":
+							currentUserState.CurrentLanguage = Langs.Tur
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "change_language_confirm", nil); err != nil {
+								logger.Fatal("Executing message template error", zap.Error(err))
+							}
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.toMain(currentUserState.CurrentLanguage), nil); err != nil {
+								logger.Fatal("Executing message template error", zap.Error(err))
+							}
+						default:
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "claim_buttons", nil); err != nil {
+								logger.Fatal("Executing message template error", zap.Error(err))
+							}
 						}
 					}
 
 				case currentUserState.currentContext == "Pick sub city" || currentUserState.currentContext == "Pick check city" || currentUserState.currentContext == "Change location city":
 					currentUserState.PickedCity = update.Message.Text
-					tmp := currentUserState.processCity()
-					if err := t.ExecuteTemplate(&buffer, tmp, currentUserState); err != nil {
+					tmp := currentUserState.processCity(currentUserState.CurrentLanguage)
+					if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, tmp, currentUserState); err != nil {
 						logger.Fatal("Executing message template error",
 							zap.Error(err),
 						)
@@ -293,19 +336,19 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 					if err != nil {
 						logger.Fatal("", zap.Error(err))
 					}
-					if update.Message.Text == "GO BACK" {
-						if err := t.ExecuteTemplate(&buffer, currentUserState.goBack(), currentUserState); err != nil {
+					if update.Message.Text == "НАЗАД" || update.Message.Text == "GO BACK" || update.Message.Text == "GERI" {
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.goBack(currentUserState.CurrentLanguage), currentUserState); err != nil {
 							logger.Fatal("Executing message template error",
 								zap.Error(err),
 							)
 						}
-						if err := t.ExecuteTemplate(&buffer, "pickCity_greet", update.Message.From); err != nil {
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "pickCity_greet", update.Message.From); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 					} else {
 						//if input is valid
 						if match.Name != "" {
-							if err := t.ExecuteTemplate(&buffer, "pickDistr_confirm", currentUserState); err != nil {
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "pickDistr_confirm", currentUserState); err != nil {
 								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 							switch currentUserState.currentContext {
@@ -313,8 +356,8 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 								currentUserState.previousContext = "Pick sub distr"
 								currentUserState.currentContext = "Pick sub alert period"
 								currentUserState.previousKeyboard = currentUserState.currentKeyboard
-								currentUserState.currentKeyboard = HoursKeyboard
-								if err := t.ExecuteTemplate(&buffer, "pickPeriod_greet", currentUserState); err != nil {
+								currentUserState.currentKeyboard = currentUserState.CurrentLanguage.HoursKeyboard
+								if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "pickPeriod_greet", currentUserState); err != nil {
 									logger.Fatal("Executing message template error", zap.Error(err))
 								}
 							case "Pick check distr":
@@ -322,10 +365,10 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 								if err != nil {
 									logger.Fatal("", zap.Error(err))
 								}
-								if err := t.ExecuteTemplate(&buffer, "listOutages", userOutages); err != nil {
+								if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "listOutages", userOutages); err != nil {
 									logger.Fatal("Error executing listOutages template", zap.Error(err))
 								}
-								if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), update.Message.From); err != nil {
+								if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.toMain(currentUserState.CurrentLanguage), update.Message.From); err != nil {
 									logger.Fatal("Executing startMsg template error", zap.Error(err))
 								}
 							case "Change location distr":
@@ -347,7 +390,7 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 								}
 								err = subStore.ModifyLocation(s)
 								if err != nil {
-									if err := t.ExecuteTemplate(&buffer, "error", nil); err != nil {
+									if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "error", nil); err != nil {
 										logger.Fatal("Executing message template error", zap.Error(err))
 									}
 									logger.Warn("", zap.Error(err))
@@ -362,16 +405,16 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 									if err := alertStore.GenerateAlertsForNewSub(*store, newSub[0]); err != nil {
 										logger.Fatal("", zap.Error(err))
 									}
-									if err := t.ExecuteTemplate(&buffer, "change_location_confirm", nil); err != nil {
+									if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "change_location_confirm", nil); err != nil {
 										logger.Fatal("Executing message template error", zap.Error(err))
 									}
-									if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), update.Message.From); err != nil {
+									if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.toMain(currentUserState.CurrentLanguage), update.Message.From); err != nil {
 										logger.Fatal("Executing startMsg template error", zap.Error(err))
 									}
 								}
 							}
 						} else {
-							if err := t.ExecuteTemplate(&buffer, "claim_buttons", update.Message.From); err != nil {
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "claim_buttons", update.Message.From); err != nil {
 								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 						}
@@ -379,16 +422,17 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 
 				case currentUserState.currentContext == "Pick sub alert period":
 					switch {
-					case update.Message.Text == "GO BACK":
-						if err := t.ExecuteTemplate(&buffer, currentUserState.goBack(), currentUserState); err != nil {
+					case update.Message.Text == "НАЗАД" || update.Message.Text == "GO BACK" || update.Message.Text == "GERI":
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.goBack(currentUserState.CurrentLanguage), currentUserState); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
-						if err := t.ExecuteTemplate(&buffer, "pickCity_confirm", currentUserState); err != nil {
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "pickCity_confirm", currentUserState); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 
-					case update.Message.Text == "2 hours" || update.Message.Text == "6 hours" || update.Message.Text == "12 hours" || update.Message.Text == "24 hours":
-						h := strings.TrimSuffix(update.Message.Text, " hours")
+					case update.Message.Text == "2 hours" || update.Message.Text == "6 hours" || update.Message.Text == "12 hours" || update.Message.Text == "24 hours" || update.Message.Text == "2 часа" || update.Message.Text == "6 часов" || update.Message.Text == "12 часов" || update.Message.Text == "24 часа" || update.Message.Text == "2 saat" || update.Message.Text == "6 saat" || update.Message.Text == "12 saat" || update.Message.Text == "24 saat":
+						re := regexp.MustCompile("[0-9]+")
+						h := re.FindString(update.Message.Text)
 						currentUserState.PickedPeriod, err = strconv.Atoi(h)
 						if err != nil {
 							logger.Fatal("Converting period error", zap.Error(err))
@@ -411,7 +455,7 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 						}
 
 						if err := subStore.Save(s); err != nil {
-							if err := t.ExecuteTemplate(&buffer, "error", nil); err != nil {
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "error", nil); err != nil {
 								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 							logger.Warn("", zap.Error(err))
@@ -424,30 +468,31 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 							logger.Fatal("", zap.Error(err))
 						}
 
-						if err := t.ExecuteTemplate(&buffer, "set_period_confirm", currentUserState); err != nil {
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "set_period_confirm", currentUserState); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
-						if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.toMain(currentUserState.CurrentLanguage), nil); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 					default:
-						if err := t.ExecuteTemplate(&buffer, "claim_buttons", update.Message.From); err != nil {
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "claim_buttons", update.Message.From); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 
 					}
 				case currentUserState.currentContext == "Change alert period":
 					switch {
-					case update.Message.Text == "GO BACK":
-						if err := t.ExecuteTemplate(&buffer, currentUserState.goBack(), currentUserState); err != nil {
+					case update.Message.Text == "НАЗАД" || update.Message.Text == "GO BACK" || update.Message.Text == "GERI":
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.goBack(currentUserState.CurrentLanguage), currentUserState); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
-						if err := t.ExecuteTemplate(&buffer, "settings_greet", nil); err != nil {
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "settings_greet", nil); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 
-					case update.Message.Text == "2 hours" || update.Message.Text == "6 hours" || update.Message.Text == "12 hours" || update.Message.Text == "24 hours":
-						h := strings.TrimSuffix(update.Message.Text, " hours")
+					case update.Message.Text == "2 hours" || update.Message.Text == "6 hours" || update.Message.Text == "12 hours" || update.Message.Text == "24 hours" || update.Message.Text == "2 часа" || update.Message.Text == "6 часов" || update.Message.Text == "12 часов" || update.Message.Text == "24 часа" || update.Message.Text == "2 saat" || update.Message.Text == "6 saat" || update.Message.Text == "12 saat" || update.Message.Text == "24 saat":
+						re := regexp.MustCompile("[0-9]+")
+						h := re.FindString(update.Message.Text)
 						currentUserState.PickedPeriod, err = strconv.Atoi(h)
 						if err != nil {
 							logger.Fatal("Converting period error", zap.Error(err))
@@ -459,7 +504,7 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 
 						err := subStore.ModifyPeriod(s)
 						if err != nil {
-							if err := t.ExecuteTemplate(&buffer, "error", nil); err != nil {
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "error", nil); err != nil {
 								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 							logger.Warn("", zap.Error(err))
@@ -474,109 +519,109 @@ func BotRunner(ds *district.DistrictStore, store *postgres.OutageStore, subStore
 							if err := alertStore.GenerateAlertsForNewSub(*store, newSub[0]); err != nil {
 								logger.Fatal("", zap.Error(err))
 							}
-							if err := t.ExecuteTemplate(&buffer, "change_period_confirm", currentUserState); err != nil {
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "change_period_confirm", currentUserState); err != nil {
 								logger.Fatal("Executing message template error", zap.Error(err))
 							}
-							if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.toMain(currentUserState.CurrentLanguage), nil); err != nil {
 								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 						}
 					}
 
 				case currentUserState.currentContext == "Subscribtion settings":
-					switch update.Message.Text {
-					case "Change location":
-						if err := t.ExecuteTemplate(&buffer, "pickCity_greet", update.Message.From); err != nil {
+					switch {
+					case update.Message.Text == "Change location"||update.Message.Text == "Изменить локацию"||update.Message.Text == "Yer değiştir":
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "pickCity_greet", update.Message.From); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 						currentUserState.currentContext = "Change location city"
-						currentUserState.currentKeyboard = CityKeyboard
+						currentUserState.currentKeyboard = currentUserState.CurrentLanguage.CityKeyboard
 						currentUserState.previousContext = "Subscribtion settings"
-						currentUserState.previousKeyboard = SettingsKeyboard
-					case "Cancel subscription":
-						if err := t.ExecuteTemplate(&buffer, "cancel_you_sure", nil); err != nil {
+						currentUserState.previousKeyboard = currentUserState.CurrentLanguage.SettingsKeyboard
+					case update.Message.Text == "Cancel subscription"||update.Message.Text == "Отменить подписку"||update.Message.Text == "Aboneliği iptal et":
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "cancel_you_sure", nil); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 
 						}
 						currentUserState.currentContext = "Cancel subscribtion confirmed"
-						currentUserState.currentKeyboard = ConfirmKeyboard
+						currentUserState.currentKeyboard = currentUserState.CurrentLanguage.ConfirmKeyboard
 						currentUserState.previousContext = "Subscribtion settings"
-						currentUserState.previousKeyboard = SettingsKeyboard
+						currentUserState.previousKeyboard = currentUserState.CurrentLanguage.SettingsKeyboard
 
-					case "Change alert period":
-						if err := t.ExecuteTemplate(&buffer, "change_period_greet", nil); err != nil {
+					case update.Message.Text == "Change alert period"||update.Message.Text == "Изменить время оповещения"||update.Message.Text == "Uyarı saatini değiştir":
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "change_period_greet", nil); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 						currentUserState.currentContext = "Change alert period"
-						currentUserState.currentKeyboard = HoursKeyboard
+						currentUserState.currentKeyboard = currentUserState.CurrentLanguage.HoursKeyboard
 						currentUserState.previousContext = "Subscribtion settings"
-						currentUserState.previousKeyboard = SettingsKeyboard
+						currentUserState.previousKeyboard = currentUserState.CurrentLanguage.SettingsKeyboard
 
-					case "View current subscription":
+					case update.Message.Text == "View current subscription"||update.Message.Text == "Посмотреть текущую подписку"||update.Message.Text == "Geçerli aboneliği görüntüle":
 						subs, err := subStore.GetSubsByChatID(update.Message.Chat.ID)
 						if err != nil {
-							if err := t.ExecuteTemplate(&buffer, "error", nil); err != nil {
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "error", nil); err != nil {
 								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 							logger.Warn("", zap.Error(err))
 						} else {
-							if err := t.ExecuteTemplate(&buffer, "show_sub", subs[0]); err != nil {
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "show_sub", subs[0]); err != nil {
 								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 						}
-						if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.toMain(currentUserState.CurrentLanguage), nil); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
-					case "GO BACK":
-						if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
+					case update.Message.Text == "НАЗАД" || update.Message.Text == "GO BACK" || update.Message.Text == "GERI":
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.toMain(currentUserState.CurrentLanguage), nil); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 					default:
-						if err := t.ExecuteTemplate(&buffer, "claim_buttons", update.Message.From); err != nil {
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "claim_buttons", update.Message.From); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 					}
 				case currentUserState.currentContext == "Cancel subscribtion confirmed":
-					switch update.Message.Text {
-					case "Yes, cancel it":
+					switch  {
+					case update.Message.Text=="Yes, cancel it"||update.Message.Text=="Да, отменить"||update.Message.Text=="Evet İptal":
 						s := subscribtion.Subscribtion{
 							ChatID: update.Message.Chat.ID,
 						}
 						if err := alertStore.CancelByChatID(update.Message.Chat.ID); err != nil {
-							if err := t.ExecuteTemplate(&buffer, "error", nil); err != nil {
+							if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "error", nil); err != nil {
 								logger.Fatal("Executing message template error", zap.Error(err))
 							}
 							logger.Warn("", zap.Error(err))
 						} else {
 							if err := subStore.CancelSubscribtion(s); err != nil {
-								if err := t.ExecuteTemplate(&buffer, "error", nil); err != nil {
+								if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "error", nil); err != nil {
 									logger.Fatal("Executing message template error", zap.Error(err))
 								}
 								logger.Warn("", zap.Error(err))
 							} else {
-								if err := t.ExecuteTemplate(&buffer, "cancel_confirm", nil); err != nil {
+								if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "cancel_confirm", nil); err != nil {
 									logger.Fatal("Executing message template error", zap.Error(err))
 								}
-								if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
+								if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.toMain(currentUserState.CurrentLanguage), nil); err != nil {
 									logger.Fatal("Executing message template error", zap.Error(err))
 								}
 							}
 						}
-					case "No, let's go back":
-						if err := t.ExecuteTemplate(&buffer, currentUserState.goBack(), nil); err != nil {
+					case update.Message.Text=="No, let's go back"||update.Message.Text=="Нет, вернуться"||update.Message.Text=="Hayır, geri gitmek":
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.goBack(currentUserState.CurrentLanguage), nil); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 					default:
-						if err := t.ExecuteTemplate(&buffer, "claim_buttons", update.Message.From); err != nil {
+						if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "claim_buttons", update.Message.From); err != nil {
 							logger.Fatal("Executing message template error", zap.Error(err))
 						}
 					}
 
 				default:
-					if err := t.ExecuteTemplate(&buffer, "press_start", nil); err != nil {
+					if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, "press_start", nil); err != nil {
 						logger.Fatal("Executing message template error", zap.Error(err))
 					}
-					if err := t.ExecuteTemplate(&buffer, currentUserState.toMain(), nil); err != nil {
+					if err := currentUserState.CurrentLanguage.Template.ExecuteTemplate(&buffer, currentUserState.toMain(currentUserState.CurrentLanguage), nil); err != nil {
 						logger.Fatal("Executing message template error", zap.Error(err))
 					}
 				}

@@ -1,6 +1,6 @@
 {{define "listOutages"}}
 {{if eq (len .) 0 }}
-    *There are no outages planned in your neighborhood in the nearest future*
+    *турThere are no outages planned in your neighborhood in the nearest future*
 {{else}}
 *Here are the planned outages found for your neighborhood:*
 {{range .}}
@@ -23,15 +23,15 @@ Hi {{escape (.UserName)}}{{escape ("!")}}
 {{end}}
 
 {{define "mainMenu_greet"}}
-What would you like to do?
+тур What would you like to do?
 {{end}}
 
 {{define "pickCity_greet"}}
-Please, pick your city from the list below:
+тур Please, pick your city from the list below:
 {{end}}
 
 {{define "settings_greet"}}
-You can modify your subscriptions here{{escape (".")}} What would you like to change?
+тур You can modify your subscriptions here{{escape (".")}} What would you like to change?
 {{end}}
 
 {{define "claim_buttons"}}
@@ -95,6 +95,7 @@ I am sorry, I am afraid I forgot what we were talking about{{escape ("(")}}
 Let{{escape ("'")}}s start from the very beginning{{escape ("!")}}
 {{end}}
 
+
 {{define "change_language"}}
 {{escape ("Please, pick your language/")}}
 {{escape ("Пожалуйста, выберите свой язык/")}}
@@ -102,9 +103,8 @@ Let{{escape ("'")}}s start from the very beginning{{escape ("!")}}
 {{end}}
 
 {{define "change_language_confirm"}}
-{{escape ("Interface language has been switched to English")}}
+Arayüz dili Türkçe olarak değiştirildi
 {{end}}
-
 
 {{define "error"}}
 OOOPS{{escape ("!")}} We are very sorry, but it looks like something went wrong{{escape (".")}} Please try again later{{escape (".")}}

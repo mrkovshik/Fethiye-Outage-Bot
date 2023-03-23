@@ -2,7 +2,7 @@ package telegram
 
 import tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 
-var HoursKeyboard = tgbotapi.NewReplyKeyboard(
+var HoursKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("2 hours"),
 		tgbotapi.NewKeyboardButton("6 hours"),
@@ -15,25 +15,119 @@ var HoursKeyboard = tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButton("GO BACK"),
 	),
 )
-var MenuKeyboard = tgbotapi.NewReplyKeyboard(
+var HoursKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("2 часа"),
+		tgbotapi.NewKeyboardButton("6 часов"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("12 часов"),
+		tgbotapi.NewKeyboardButton("24 часа"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Назад"),
+	),
+)
+
+var HoursKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("2 saat"),
+		tgbotapi.NewKeyboardButton("6 saat"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("12 saat"),
+		tgbotapi.NewKeyboardButton("24 saat"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+var MenuKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Subscribe for alerts"),
 		tgbotapi.NewKeyboardButton("Check out for outages"),
 	),
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Subscription settings"),
+		tgbotapi.NewKeyboardButton("Рус/Eng/Tür"),
 	),
-	
+)
+var MenuKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Подписаться на оповещения"),
+		tgbotapi.NewKeyboardButton("Проверить отключения"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Настройки оповещений"),
+		tgbotapi.NewKeyboardButton("Рус/Eng/Tür"),
+	),
 )
 
-var ConfirmKeyboard = tgbotapi.NewReplyKeyboard(
+var MenuKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Uyarılara abone ol"),
+		tgbotapi.NewKeyboardButton("Kapatmaları kontrol et"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Uyarı ayarları"),
+		tgbotapi.NewKeyboardButton("Рус/Eng/Tür"),
+	),
+)
+
+var ConfirmKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Yes, cancel it"),
 		tgbotapi.NewKeyboardButton("No, let's go back"),
 	),
 )
 
-var SettingsKeyboard = tgbotapi.NewReplyKeyboard(
+var ConfirmKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Да, отменить"),
+		tgbotapi.NewKeyboardButton("Нет, вернуться"),
+	),
+)
+
+var ConfirmKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Evet İptal"),
+		tgbotapi.NewKeyboardButton("Hayır, geri gitmek"),
+	),
+)
+
+
+var LanguageKeyboardEng = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("English"),
+		tgbotapi.NewKeyboardButton("Русский"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Türkçe"),
+		tgbotapi.NewKeyboardButton("GO BACK"),
+	),
+)
+var LanguageKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("English"),
+		tgbotapi.NewKeyboardButton("Русский"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Türkçe"),
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+var LanguageKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("English"),
+		tgbotapi.NewKeyboardButton("Русский"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Türkçe"),
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+
+var SettingsKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Change location"),
 		tgbotapi.NewKeyboardButton("Change alert period"),
@@ -46,8 +140,35 @@ var SettingsKeyboard = tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButton("GO BACK"),
 	),
 )
+var SettingsKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Изменить локацию"),
+		tgbotapi.NewKeyboardButton("Изменить время оповещения"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Отменить подписку"),
+		tgbotapi.NewKeyboardButton("Посмотреть текущую подписку"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
 
-var CityKeyboard = tgbotapi.NewReplyKeyboard(
+var SettingsKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yer değiştir"),
+		tgbotapi.NewKeyboardButton("Uyarı saatini değiştir"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Aboneliği iptal et"),
+		tgbotapi.NewKeyboardButton("Geçerli aboneliği görüntüle"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+
+var CityKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Bodrum"),
 		tgbotapi.NewKeyboardButton("Dalaman"),
@@ -73,8 +194,59 @@ var CityKeyboard = tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButton("GO BACK"),
 	),
 )
-
-var FethiyeKeyboard = tgbotapi.NewReplyKeyboard(
+var CityKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bodrum"),
+		tgbotapi.NewKeyboardButton("Dalaman"),
+		tgbotapi.NewKeyboardButton("Datça"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Fethiye"),
+		tgbotapi.NewKeyboardButton("Kavaklıdere"),
+		tgbotapi.NewKeyboardButton("Köyceğiz"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Marmaris"),
+		tgbotapi.NewKeyboardButton("Menteşe"),
+		tgbotapi.NewKeyboardButton("Milas"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ortaca "),
+		tgbotapi.NewKeyboardButton("Seydikemer"),
+		tgbotapi.NewKeyboardButton("Ula"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yatağan"),
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+var CityKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bodrum"),
+		tgbotapi.NewKeyboardButton("Dalaman"),
+		tgbotapi.NewKeyboardButton("Datça"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Fethiye"),
+		tgbotapi.NewKeyboardButton("Kavaklıdere"),
+		tgbotapi.NewKeyboardButton("Köyceğiz"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Marmaris"),
+		tgbotapi.NewKeyboardButton("Menteşe"),
+		tgbotapi.NewKeyboardButton("Milas"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ortaca "),
+		tgbotapi.NewKeyboardButton("Seydikemer"),
+		tgbotapi.NewKeyboardButton("Ula"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yatağan"),
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+var FethiyeKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Akarca"),
 		tgbotapi.NewKeyboardButton("Babataşı"),
@@ -150,7 +322,7 @@ var FethiyeKeyboard = tgbotapi.NewReplyKeyboard(
 	),
 )
 
-var DalamanKeyboard = tgbotapi.NewReplyKeyboard(
+var DalamanKeyboardEng = tgbotapi.NewReplyKeyboard(
 
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Akçataş"),
@@ -198,7 +370,7 @@ var DalamanKeyboard = tgbotapi.NewReplyKeyboard(
 	),
 )
 
-var KavaklidereKeyboard = tgbotapi.NewReplyKeyboard(
+var KavaklidereKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Bakırcılar"),
 		tgbotapi.NewKeyboardButton("Çamlıbel"),
@@ -228,7 +400,7 @@ var KavaklidereKeyboard = tgbotapi.NewReplyKeyboard(
 	),
 )
 
-var KoycegizKeyboard = tgbotapi.NewReplyKeyboard(
+var KoycegizKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Akköprü"),
 		tgbotapi.NewKeyboardButton("Balcılar"),
@@ -275,7 +447,7 @@ var KoycegizKeyboard = tgbotapi.NewReplyKeyboard(
 	),
 )
 
-var MarmarisKeyboard = tgbotapi.NewReplyKeyboard(
+var MarmarisKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Adaköy"),
 		tgbotapi.NewKeyboardButton("Armutalan"),
@@ -322,7 +494,7 @@ var MarmarisKeyboard = tgbotapi.NewReplyKeyboard(
 	),
 )
 
-var MenteseKeyboard = tgbotapi.NewReplyKeyboard(
+var MenteseKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Akçaova"),
 		tgbotapi.NewKeyboardButton("Akkaya"),
@@ -439,7 +611,7 @@ var MenteseKeyboard = tgbotapi.NewReplyKeyboard(
 	),
 )
 
-var MilasKeyboard = tgbotapi.NewReplyKeyboard(
+var MilasKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Ağaçlıhüyük"),
 		tgbotapi.NewKeyboardButton("Ahmetçavuş-Hayıtlı"),
@@ -665,7 +837,7 @@ var MilasKeyboard = tgbotapi.NewReplyKeyboard(
 	),
 )
 
-var SeydikemerKeyboard = tgbotapi.NewReplyKeyboard(
+var SeydikemerKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Alaçat"),
 		tgbotapi.NewKeyboardButton("Arifler"),
@@ -780,7 +952,7 @@ var SeydikemerKeyboard = tgbotapi.NewReplyKeyboard(
 	),
 )
 
-var UlaKeyboard = tgbotapi.NewReplyKeyboard(
+var UlaKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Akçapınar"),
 		tgbotapi.NewKeyboardButton("Akyaka "),
@@ -836,7 +1008,7 @@ var UlaKeyboard = tgbotapi.NewReplyKeyboard(
 	),
 )
 
-var YataganKeyboard = tgbotapi.NewReplyKeyboard(
+var YataganKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Akgedik"),
 		tgbotapi.NewKeyboardButton("Akyol"),
@@ -926,7 +1098,7 @@ var YataganKeyboard = tgbotapi.NewReplyKeyboard(
 	),
 )
 
-var OrtacaKeyboard = tgbotapi.NewReplyKeyboard(
+var OrtacaKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Akıncı"),
 		tgbotapi.NewKeyboardButton("Arıkbaşı"),
@@ -977,7 +1149,7 @@ var OrtacaKeyboard = tgbotapi.NewReplyKeyboard(
 	),
 )
 
-var DatcaKeyboard = tgbotapi.NewReplyKeyboard(
+var DatcaKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Cumalı"),
 		tgbotapi.NewKeyboardButton("Datça"),
@@ -1003,7 +1175,7 @@ var DatcaKeyboard = tgbotapi.NewReplyKeyboard(
 	),
 )
 
-var BodrumKeyboard = tgbotapi.NewReplyKeyboard(
+var BodrumKeyboardEng = tgbotapi.NewReplyKeyboard(
 	tgbotapi.NewKeyboardButtonRow(
 		tgbotapi.NewKeyboardButton("Akçaalan"),
 		tgbotapi.NewKeyboardButton("Akyarlar"),
@@ -1103,5 +1275,2065 @@ var BodrumKeyboard = tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButton("Yokuşbaşı"),
 		tgbotapi.NewKeyboardButton("GO BACK"),
 	),
-	
+)
+
+var FethiyeKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akarca"),
+		tgbotapi.NewKeyboardButton("Babataşı"),
+		tgbotapi.NewKeyboardButton("Bozyer"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Cami"),
+		tgbotapi.NewKeyboardButton("Çamköy"),
+		tgbotapi.NewKeyboardButton("Çatalarık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çenger"),
+		tgbotapi.NewKeyboardButton("Çiftlik"),
+		tgbotapi.NewKeyboardButton("Cumhuriyet"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Eldirek"),
+		tgbotapi.NewKeyboardButton("Esenköy"),
+		tgbotapi.NewKeyboardButton("Faralya"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Foça"),
+		tgbotapi.NewKeyboardButton("Göcek"),
+		tgbotapi.NewKeyboardButton("Gökben"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gökçeovacık"),
+		tgbotapi.NewKeyboardButton("İncirköy"),
+		tgbotapi.NewKeyboardButton("İnlice"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Karaağaç"),
+		tgbotapi.NewKeyboardButton("Karacaören"),
+		tgbotapi.NewKeyboardButton("Karacula"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Karagedik"),
+		tgbotapi.NewKeyboardButton("Karagözler"),
+		tgbotapi.NewKeyboardButton("Karakeçililer"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kargı"),
+		tgbotapi.NewKeyboardButton("Kayaköy"),
+		tgbotapi.NewKeyboardButton("Kesikkapı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kızılbel"),
+		tgbotapi.NewKeyboardButton("Koruköy"),
+		tgbotapi.NewKeyboardButton("Menteşeoğlu"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Nif"),
+		tgbotapi.NewKeyboardButton("Ölüdeniz"),
+		tgbotapi.NewKeyboardButton("Patlangıç"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Pazaryeri"),
+		tgbotapi.NewKeyboardButton("Sögütlü"),
+		tgbotapi.NewKeyboardButton("Taşyaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Tuzla"),
+		tgbotapi.NewKeyboardButton("Yakacık"),
+		tgbotapi.NewKeyboardButton("Yanıklar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yeni"),
+		tgbotapi.NewKeyboardButton("Yeşilüzümlü"),
+	),
+
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+
+var DalamanKeyboardRus = tgbotapi.NewReplyKeyboard(
+
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akçataş"),
+		tgbotapi.NewKeyboardButton("Altıntas"),
+		tgbotapi.NewKeyboardButton("Atakent"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bezkese"),
+		tgbotapi.NewKeyboardButton("Bozbel"),
+		tgbotapi.NewKeyboardButton("Çöğmen"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Darıyeri"),
+		tgbotapi.NewKeyboardButton("Ege"),
+		tgbotapi.NewKeyboardButton("Elcik"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gürköy"),
+		tgbotapi.NewKeyboardButton("Gürleyk"),
+		tgbotapi.NewKeyboardButton("Hürriyet"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kapukargın"),
+		tgbotapi.NewKeyboardButton("Karacaağaç"),
+		tgbotapi.NewKeyboardButton("Karaçalı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kargınkürü"),
+		tgbotapi.NewKeyboardButton("Kavacık"),
+		tgbotapi.NewKeyboardButton("Kayadibi"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kızılkaya"),
+		tgbotapi.NewKeyboardButton("Merkez"),
+		tgbotapi.NewKeyboardButton("Narlı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Sabunlu"),
+		tgbotapi.NewKeyboardButton("Şerefler"),
+		tgbotapi.NewKeyboardButton("Söğütlüyurt"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Taşbaşı"),
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+
+var KavaklidereKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bakırcılar"),
+		tgbotapi.NewKeyboardButton("Çamlıbel"),
+		tgbotapi.NewKeyboardButton("Çamlıyurt"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çavdır"),
+		tgbotapi.NewKeyboardButton("Çayboyu"),
+		tgbotapi.NewKeyboardButton("Cumhuriyet"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Derebağ"),
+		tgbotapi.NewKeyboardButton("Kurucuova"),
+		tgbotapi.NewKeyboardButton("Menteşe"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Nebiler"),
+		tgbotapi.NewKeyboardButton("Ortaköy"),
+		tgbotapi.NewKeyboardButton("Salkım"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yeni"),
+		tgbotapi.NewKeyboardButton("Yeşilköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+
+var KoycegizKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akköprü"),
+		tgbotapi.NewKeyboardButton("Balcılar"),
+		tgbotapi.NewKeyboardButton("Beyobası"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çandır"),
+		tgbotapi.NewKeyboardButton("Çayhisar"),
+		tgbotapi.NewKeyboardButton("Döğüşbelen"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ekincik"),
+		tgbotapi.NewKeyboardButton("Gelişim"),
+		tgbotapi.NewKeyboardButton("Gülpınar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hamitköy"),
+		tgbotapi.NewKeyboardButton("Karaçam"),
+		tgbotapi.NewKeyboardButton("Kavakarasi"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Köyceğiz"),
+		tgbotapi.NewKeyboardButton("Otmanlar"),
+		tgbotapi.NewKeyboardButton("Pınar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Sazak"),
+		tgbotapi.NewKeyboardButton("Sultaniye"),
+		tgbotapi.NewKeyboardButton("Toparlar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ulucami"),
+		tgbotapi.NewKeyboardButton("Yangı"),
+		tgbotapi.NewKeyboardButton("Yayla"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yeni"),
+		tgbotapi.NewKeyboardButton("Yeşilköy"),
+		tgbotapi.NewKeyboardButton("Zaferler"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Zeytinalanı"),
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+
+var MarmarisKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Adaköy"),
+		tgbotapi.NewKeyboardButton("Armutalan"),
+		tgbotapi.NewKeyboardButton("Bayır"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Beldibi"),
+		tgbotapi.NewKeyboardButton("Bozburun"),
+		tgbotapi.NewKeyboardButton("Çamdibi"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çamlı"),
+		tgbotapi.NewKeyboardButton("Çetibeli"),
+		tgbotapi.NewKeyboardButton("Çıldır"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hatipirimi"),
+		tgbotapi.NewKeyboardButton("Hisarönü"),
+		tgbotapi.NewKeyboardButton("İçmeler"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Karaca"),
+		tgbotapi.NewKeyboardButton("Kemeraltı"),
+		tgbotapi.NewKeyboardButton("Orhaniye"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Osmaniye"),
+		tgbotapi.NewKeyboardButton("Sarıana"),
+		tgbotapi.NewKeyboardButton("Selimiye"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Siteler"),
+		tgbotapi.NewKeyboardButton("Söğüt"),
+		tgbotapi.NewKeyboardButton("Taşlıca"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Tepe"),
+		tgbotapi.NewKeyboardButton("Turgut"),
+		tgbotapi.NewKeyboardButton("Turunç"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yeşilbelde"),
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+
+var MenteseKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akçaova"),
+		tgbotapi.NewKeyboardButton("Akkaya"),
+		tgbotapi.NewKeyboardButton("Akyer"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Algı"),
+		tgbotapi.NewKeyboardButton("Avcılar"),
+		tgbotapi.NewKeyboardButton("Bağyaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Balıbey"),
+		tgbotapi.NewKeyboardButton("Bayır"),
+		tgbotapi.NewKeyboardButton("Bozyer"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çakmak"),
+		tgbotapi.NewKeyboardButton("Camikebir"),
+		tgbotapi.NewKeyboardButton("Çamoluk"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çatakbağyaka"),
+		tgbotapi.NewKeyboardButton("Çaybükü"),
+		tgbotapi.NewKeyboardButton("Çiftlik"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çırpı"),
+		tgbotapi.NewKeyboardButton("Dağdibi"),
+		tgbotapi.NewKeyboardButton("Dağpınar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Denizova"),
+		tgbotapi.NewKeyboardButton("Derinkuyu"),
+		tgbotapi.NewKeyboardButton("Doğan"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Dokuzçam"),
+		tgbotapi.NewKeyboardButton("Düğerek"),
+		tgbotapi.NewKeyboardButton("Emirbeyazıt"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Esençay"),
+		tgbotapi.NewKeyboardButton("Fadıl"),
+		tgbotapi.NewKeyboardButton("Gazeller"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Göktepe"),
+		tgbotapi.NewKeyboardButton("Gülağzı"),
+		tgbotapi.NewKeyboardButton("Günlüce"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hacırüstem"),
+		tgbotapi.NewKeyboardButton("İkizce"),
+		tgbotapi.NewKeyboardButton("Kafaca"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Karacaören"),
+		tgbotapi.NewKeyboardButton("Karamehmet"),
+		tgbotapi.NewKeyboardButton("Karşıyaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kiramettin"),
+		tgbotapi.NewKeyboardButton("Kıran"),
+		tgbotapi.NewKeyboardButton("Kötekli"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kozağaç"),
+		tgbotapi.NewKeyboardButton("Kuyucak"),
+		tgbotapi.NewKeyboardButton("Kuzluk"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Meke"),
+		tgbotapi.NewKeyboardButton("Muratlar"),
+		tgbotapi.NewKeyboardButton("Muslihittin"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Müştakbey"),
+		tgbotapi.NewKeyboardButton("Orhaniye"),
+		tgbotapi.NewKeyboardButton("Orta"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ortaköy"),
+		tgbotapi.NewKeyboardButton("Özlüce"),
+		tgbotapi.NewKeyboardButton("Paşapınarı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Salihpaşalar"),
+		tgbotapi.NewKeyboardButton("Sarnıç"),
+		tgbotapi.NewKeyboardButton("Şenyayla"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Şeyh"),
+		tgbotapi.NewKeyboardButton("Sungur"),
+		tgbotapi.NewKeyboardButton("Taşlı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yaraş"),
+		tgbotapi.NewKeyboardButton("Yemişendere"),
+		tgbotapi.NewKeyboardButton("Yenibağyaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yenice"),
+		tgbotapi.NewKeyboardButton("Yeniköy"),
+		tgbotapi.NewKeyboardButton("Yeniköy Yerkesik"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yerkesik"),
+		tgbotapi.NewKeyboardButton("Yeşilyurt"),
+		tgbotapi.NewKeyboardButton("Yörükoğlu"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Zeytin"),
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+
+var MilasKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ağaçlıhüyük"),
+		tgbotapi.NewKeyboardButton("Ahmetçavuş-Hayıtlı"),
+		tgbotapi.NewKeyboardButton("Akçakaya"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akçalı"),
+		tgbotapi.NewKeyboardButton("Akkovanlık"),
+		tgbotapi.NewKeyboardButton("Akyol"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Alaçam"),
+		tgbotapi.NewKeyboardButton("Alatepe"),
+		tgbotapi.NewKeyboardButton("Aslanyaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Avşar"),
+		tgbotapi.NewKeyboardButton("Aydınlıkevler"),
+		tgbotapi.NewKeyboardButton("Bafa"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bağdamları"),
+		tgbotapi.NewKeyboardButton("Baharlı"),
+		tgbotapi.NewKeyboardButton("Bahçe"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bahçeburun"),
+		tgbotapi.NewKeyboardButton("Balcılar"),
+		tgbotapi.NewKeyboardButton("Bayır"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Beçin"),
+		tgbotapi.NewKeyboardButton("Beyciler"),
+		tgbotapi.NewKeyboardButton("Boğaziçi"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bozalan"),
+		tgbotapi.NewKeyboardButton("Bozbük"),
+		tgbotapi.NewKeyboardButton("Burgaz"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çakıralan"),
+		tgbotapi.NewKeyboardButton("Çallı"),
+		tgbotapi.NewKeyboardButton("Çamköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çamlıbelen"),
+		tgbotapi.NewKeyboardButton("Çamlıca"),
+		tgbotapi.NewKeyboardButton("Çamlıyurt"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çamovalı"),
+		tgbotapi.NewKeyboardButton("Çandır"),
+		tgbotapi.NewKeyboardButton("Çiftlik"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çınarlı"),
+		tgbotapi.NewKeyboardButton("Çökertme"),
+		tgbotapi.NewKeyboardButton("Çomakdağkızılağaç"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çukur"),
+		tgbotapi.NewKeyboardButton("CumhurKılavuziyet"),
+		tgbotapi.NewKeyboardButton("Damlıboğaz"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Danişment"),
+		tgbotapi.NewKeyboardButton("Demirciler"),
+		tgbotapi.NewKeyboardButton("Dere"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Derince"),
+		tgbotapi.NewKeyboardButton("Dibekdere"),
+		tgbotapi.NewKeyboardButton("Dörttepe"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Eğridere"),
+		tgbotapi.NewKeyboardButton("Ekinanbarı"),
+		tgbotapi.NewKeyboardButton("Ekindere"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ekizköy"),
+		tgbotapi.NewKeyboardButton("Ekiztaş"),
+		tgbotapi.NewKeyboardButton("Emek"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Epçe"),
+		tgbotapi.NewKeyboardButton("Etrenli"),
+		tgbotapi.NewKeyboardButton("Fesleğen"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Firuzpaşa-Gazipaşa"),
+		tgbotapi.NewKeyboardButton("Gökbel"),
+		tgbotapi.NewKeyboardButton("Gökçeler"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Göldere"),
+		tgbotapi.NewKeyboardButton("Gölyaka"),
+		tgbotapi.NewKeyboardButton("Güllük"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gümüşlük"),
+		tgbotapi.NewKeyboardButton("Güneş"),
+		tgbotapi.NewKeyboardButton("Günlük"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gürçamlar"),
+		tgbotapi.NewKeyboardButton("Gürceğiz"),
+		tgbotapi.NewKeyboardButton("Hacıabti"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hacıahmetler"),
+		tgbotapi.NewKeyboardButton("Hacı İlyas"),
+		tgbotapi.NewKeyboardButton("Hasanlar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hisarbaşı-Hoca"),
+		tgbotapi.NewKeyboardButton("Hisarcık"),
+		tgbotapi.NewKeyboardButton("Hüsamlar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("İçme"),
+		tgbotapi.NewKeyboardButton("İsmet Paşa"),
+		tgbotapi.NewKeyboardButton("Kafaca"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kalem"),
+		tgbotapi.NewKeyboardButton("Kalınağıl"),
+		tgbotapi.NewKeyboardButton("Kandak"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kapıkırı"),
+		tgbotapi.NewKeyboardButton("Karacaağaç"),
+		tgbotapi.NewKeyboardButton("Karacahisar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Karahayıt"),
+		tgbotapi.NewKeyboardButton("Karakuyu"),
+		tgbotapi.NewKeyboardButton("Karapınar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kargıcak"),
+		tgbotapi.NewKeyboardButton("Karşıyaka"),
+		tgbotapi.NewKeyboardButton("Kayabaşı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kayabükü"),
+		tgbotapi.NewKeyboardButton("Kayadere"),
+		tgbotapi.NewKeyboardButton("Kazıklı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kemikler"),
+		tgbotapi.NewKeyboardButton("Ketendere"),
+		tgbotapi.NewKeyboardButton("Kılavuz"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kırcağız"),
+		tgbotapi.NewKeyboardButton("Kısırlar2"),
+		tgbotapi.NewKeyboardButton("Kıyıkışlacık3"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kızılağaç"),
+		tgbotapi.NewKeyboardButton("Kızılcakuyu"),
+		tgbotapi.NewKeyboardButton("Kızılcayıkık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Konak"),
+		tgbotapi.NewKeyboardButton("Koru"),
+		tgbotapi.NewKeyboardButton("Korucuk"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Köşk"),
+		tgbotapi.NewKeyboardButton("Küçükdibekdere"),
+		tgbotapi.NewKeyboardButton("Kultak"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kurudere"),
+		tgbotapi.NewKeyboardButton("Kuzyaka"),
+		tgbotapi.NewKeyboardButton("Menteş"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Meşelik"),
+		tgbotapi.NewKeyboardButton("Narhisar"),
+		tgbotapi.NewKeyboardButton("Olukbaşı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ören"),
+		tgbotapi.NewKeyboardButton("Ortaköy"),
+		tgbotapi.NewKeyboardButton("Ovakışlacık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Pinar"),
+		tgbotapi.NewKeyboardButton("Pınararası"),
+		tgbotapi.NewKeyboardButton("Pınarcık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Sakarkaya"),
+		tgbotapi.NewKeyboardButton("Sarıkaya"),
+		tgbotapi.NewKeyboardButton("Savran"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Sek"),
+		tgbotapi.NewKeyboardButton("Selimiye"),
+		tgbotapi.NewKeyboardButton("Şenköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Şevketiye"),
+		tgbotapi.NewKeyboardButton("Söğütçük"),
+		tgbotapi.NewKeyboardButton("Türkevleri"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Tuzabat"),
+		tgbotapi.NewKeyboardButton("Ulaş"),
+		tgbotapi.NewKeyboardButton("Yaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yaşyer"),
+		tgbotapi.NewKeyboardButton("Yoğunoluk"),
+		tgbotapi.NewKeyboardButton("Yusufca"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+
+var SeydikemerKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Alaçat"),
+		tgbotapi.NewKeyboardButton("Arifler"),
+		tgbotapi.NewKeyboardButton("Arsaköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Atlıdere"),
+		tgbotapi.NewKeyboardButton("Bağlıağaç"),
+		tgbotapi.NewKeyboardButton("Bayırköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bekçiler"),
+		tgbotapi.NewKeyboardButton("Belen"),
+		tgbotapi.NewKeyboardButton("Boğalar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Boğaziçi"),
+		tgbotapi.NewKeyboardButton("Çaltılar"),
+		tgbotapi.NewKeyboardButton("Çaltıözü"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çamurköy"),
+		tgbotapi.NewKeyboardButton("Çatak"),
+		tgbotapi.NewKeyboardButton("Çayan"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çaykenarı"),
+		tgbotapi.NewKeyboardButton("Ceylan"),
+		tgbotapi.NewKeyboardButton("Çobanisa"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çobanlar"),
+		tgbotapi.NewKeyboardButton("Çökek"),
+		tgbotapi.NewKeyboardButton("Çukurincir"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Cumhuriyet"),
+		tgbotapi.NewKeyboardButton("Demirler"),
+		tgbotapi.NewKeyboardButton("Dereköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Dodurga"),
+		tgbotapi.NewKeyboardButton("Doğanlar"),
+		tgbotapi.NewKeyboardButton("Döğer"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Dont"),
+		tgbotapi.NewKeyboardButton("Eşen"),
+		tgbotapi.NewKeyboardButton("Gerişburnu"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Girmeler"),
+		tgbotapi.NewKeyboardButton("Gölbent"),
+		tgbotapi.NewKeyboardButton("Güneşli"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hacıosmanlar"),
+		tgbotapi.NewKeyboardButton("İzzettinköy"),
+		tgbotapi.NewKeyboardButton("Kabaağaç"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kadıköy"),
+		tgbotapi.NewKeyboardButton("Karadere"),
+		tgbotapi.NewKeyboardButton("Karaköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kayabaşı"),
+		tgbotapi.NewKeyboardButton("Kayacık"),
+		tgbotapi.NewKeyboardButton("Kayadibi"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kıncılar"),
+		tgbotapi.NewKeyboardButton("Kınık"),
+		tgbotapi.NewKeyboardButton("Korubükü"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kumluova"),
+		tgbotapi.NewKeyboardButton("Menekşe"),
+		tgbotapi.NewKeyboardButton("Minare"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ören"),
+		tgbotapi.NewKeyboardButton("Ortaköy"),
+		tgbotapi.NewKeyboardButton("Paşalı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Sahilceylan"),
+		tgbotapi.NewKeyboardButton("Sarıyer"),
+		tgbotapi.NewKeyboardButton("Seki"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Seydiler"),
+		tgbotapi.NewKeyboardButton("Söğütlüdere"),
+		tgbotapi.NewKeyboardButton("Temel"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Uğurlu"),
+		tgbotapi.NewKeyboardButton("Yakabağ"),
+		tgbotapi.NewKeyboardButton("Yakaköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yayla Eldirek"),
+		tgbotapi.NewKeyboardButton("Yayla Gökben"),
+		tgbotapi.NewKeyboardButton("Yayla Karaçulha"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yaylapatlangıç"),
+		tgbotapi.NewKeyboardButton("Zorlar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+
+var UlaKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akçapınar"),
+		tgbotapi.NewKeyboardButton("Akyaka "),
+		tgbotapi.NewKeyboardButton("Alparslan"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Arıcılar"),
+		tgbotapi.NewKeyboardButton("Armutcuk"),
+		tgbotapi.NewKeyboardButton("Ataköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ayazkıyı"),
+		tgbotapi.NewKeyboardButton("Çiçekli"),
+		tgbotapi.NewKeyboardButton("Çıtlık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çörüş"),
+		tgbotapi.NewKeyboardButton("Demirtaş"),
+		tgbotapi.NewKeyboardButton("Elmalı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Esentepe"),
+		tgbotapi.NewKeyboardButton("Gökçe"),
+		tgbotapi.NewKeyboardButton("Gökova"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gölcük"),
+		tgbotapi.NewKeyboardButton("Karabörtlen"),
+		tgbotapi.NewKeyboardButton("Kavakçalı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kıra"),
+		tgbotapi.NewKeyboardButton("Kızılağaç"),
+		tgbotapi.NewKeyboardButton("Kızılyaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Köprübaşı"),
+		tgbotapi.NewKeyboardButton("Örnekköy"),
+		tgbotapi.NewKeyboardButton("Portakallık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Sarayyanı"),
+		tgbotapi.NewKeyboardButton("Şirinköy"),
+		tgbotapi.NewKeyboardButton("Turgut"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yaylasöğüt"),
+		tgbotapi.NewKeyboardButton("Yeşilçam"),
+		tgbotapi.NewKeyboardButton("Yeşilova"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+
+var YataganKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akgedik"),
+		tgbotapi.NewKeyboardButton("Akyol"),
+		tgbotapi.NewKeyboardButton("Alaşar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Atatürk"),
+		tgbotapi.NewKeyboardButton("Bağyaka"),
+		tgbotapi.NewKeyboardButton("Bahçeyaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bencik"),
+		tgbotapi.NewKeyboardButton("Bozarmut"),
+		tgbotapi.NewKeyboardButton("Bozüyük"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çakırlar"),
+		tgbotapi.NewKeyboardButton("Çamlıca"),
+		tgbotapi.NewKeyboardButton("Cazkırlar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çukuröz"),
+		tgbotapi.NewKeyboardButton("Cumhuriyet"),
+		tgbotapi.NewKeyboardButton("Dere"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Deştin"),
+		tgbotapi.NewKeyboardButton("Doğanköy"),
+		tgbotapi.NewKeyboardButton("Elmacık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Esenköy"),
+		tgbotapi.NewKeyboardButton("Eskihisar"),
+		tgbotapi.NewKeyboardButton("Gökgedik"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gökpınar"),
+		tgbotapi.NewKeyboardButton("Hacıbayramlar"),
+		tgbotapi.NewKeyboardButton("Hacıveliler"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hisarardı"),
+		tgbotapi.NewKeyboardButton("Kadıköy"),
+		tgbotapi.NewKeyboardButton("Kafacakaplancık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kapubağ"),
+		tgbotapi.NewKeyboardButton("Katrancı"),
+		tgbotapi.NewKeyboardButton("Kavak"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kırıkköy"),
+		tgbotapi.NewKeyboardButton("Köklük"),
+		tgbotapi.NewKeyboardButton("Konak"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kozağaç"),
+		tgbotapi.NewKeyboardButton("Madenler"),
+		tgbotapi.NewKeyboardButton("Mesken"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Nebiköy"),
+		tgbotapi.NewKeyboardButton("Şahinler"),
+		tgbotapi.NewKeyboardButton("Şeref"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Turgut"),
+		tgbotapi.NewKeyboardButton("Turgutlar"),
+		tgbotapi.NewKeyboardButton("Yava"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yayla"),
+		tgbotapi.NewKeyboardButton("Yeni"),
+		tgbotapi.NewKeyboardButton("Yenikarakuyu"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yeniköy"),
+		tgbotapi.NewKeyboardButton("Yeşilbağcılar"),
+		tgbotapi.NewKeyboardButton("Yeşilköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yukarıyayla"),
+		tgbotapi.NewKeyboardButton("Zeytinköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+
+var OrtacaKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akıncı"),
+		tgbotapi.NewKeyboardButton("Arıkbaşı"),
+		tgbotapi.NewKeyboardButton("Atatürk"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bahçelievler"),
+		tgbotapi.NewKeyboardButton("Beşköprü"),
+		tgbotapi.NewKeyboardButton("Çaylı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Cumhuriyet"),
+		tgbotapi.NewKeyboardButton("Dalaklı"),
+		tgbotapi.NewKeyboardButton("Dalyan"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Dereköy"),
+		tgbotapi.NewKeyboardButton("Dikmekavak"),
+		tgbotapi.NewKeyboardButton("Ekşiliyurt"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Eskiköy"),
+		tgbotapi.NewKeyboardButton("Fevziye"),
+		tgbotapi.NewKeyboardButton("Gökbel"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gölbaşı"),
+		tgbotapi.NewKeyboardButton("Güzelyurt"),
+		tgbotapi.NewKeyboardButton("Karaburun"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Karadonlar"),
+		tgbotapi.NewKeyboardButton("Kemaliye"),
+		tgbotapi.NewKeyboardButton("Mergenli"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Okçular"),
+		tgbotapi.NewKeyboardButton("Sarıgerme"),
+		tgbotapi.NewKeyboardButton("Tepearası"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Terzialiler"),
+		tgbotapi.NewKeyboardButton("Yerbelen"),
+		tgbotapi.NewKeyboardButton("Yeşilyurt"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+
+var DatcaKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Cumalı"),
+		tgbotapi.NewKeyboardButton("Datça"),
+		tgbotapi.NewKeyboardButton("Emecik"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hızırşah"),
+		tgbotapi.NewKeyboardButton("İskele"),
+		tgbotapi.NewKeyboardButton("Karaköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kızlan"),
+		tgbotapi.NewKeyboardButton("Mesudiye"),
+		tgbotapi.NewKeyboardButton("Reşadiye"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Sındı"),
+		tgbotapi.NewKeyboardButton("Yaka"),
+		tgbotapi.NewKeyboardButton("Yazı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+
+var BodrumKeyboardRus = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akçaalan"),
+		tgbotapi.NewKeyboardButton("Akyarlar"),
+		tgbotapi.NewKeyboardButton("Bahçelievler"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bahçeyaka"),
+		tgbotapi.NewKeyboardButton("Bitez"),
+		tgbotapi.NewKeyboardButton("Çamarası"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çamlık"),
+		tgbotapi.NewKeyboardButton("Çarşı"),
+		tgbotapi.NewKeyboardButton("Cevat Şakir"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çiftlik"),
+		tgbotapi.NewKeyboardButton("Çırkan"),
+		tgbotapi.NewKeyboardButton("Çömlekçi"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Cumhuriyet"),
+		tgbotapi.NewKeyboardButton("Dağbelen"),
+		tgbotapi.NewKeyboardButton("Dereköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Dirmil"),
+		tgbotapi.NewKeyboardButton("Eskiçeşme"),
+		tgbotapi.NewKeyboardButton("Farilya"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Geriş"),
+		tgbotapi.NewKeyboardButton("Gökpınar"),
+		tgbotapi.NewKeyboardButton("Gölbaşı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gölköy"),
+		tgbotapi.NewKeyboardButton("Göltürkbükü"),
+		tgbotapi.NewKeyboardButton("Gümbet"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gümüşlük"),
+		tgbotapi.NewKeyboardButton("Gündoğan"),
+		tgbotapi.NewKeyboardButton("Gürece"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Güvercinlik"),
+		tgbotapi.NewKeyboardButton("İslamhaneleri"),
+		tgbotapi.NewKeyboardButton("Karabağ"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Karaova"),
+		tgbotapi.NewKeyboardButton("Kemer"),
+		tgbotapi.NewKeyboardButton("Kızıkağaç"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Konacık"),
+		tgbotapi.NewKeyboardButton("Koyunbaba"),
+		tgbotapi.NewKeyboardButton("Küçükbük"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kumbahçe"),
+		tgbotapi.NewKeyboardButton("Kumköy"),
+		tgbotapi.NewKeyboardButton("Mazıköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Mumcular"),
+		tgbotapi.NewKeyboardButton("Müskebi"),
+		tgbotapi.NewKeyboardButton("Ortakentyahşi"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Peksimet"),
+		tgbotapi.NewKeyboardButton("Pınarlıbelen"),
+		tgbotapi.NewKeyboardButton("Sazköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Tepecik"),
+		tgbotapi.NewKeyboardButton("Tepecik Karaova"),
+		tgbotapi.NewKeyboardButton("Torba"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Turgutreis"),
+		tgbotapi.NewKeyboardButton("Türkbükü"),
+		tgbotapi.NewKeyboardButton("Türkkuyusu"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Umurca"),
+		tgbotapi.NewKeyboardButton("Yahşi"),
+		tgbotapi.NewKeyboardButton("Yakaköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yalıkavak"),
+		tgbotapi.NewKeyboardButton("Yeniköy"),
+		tgbotapi.NewKeyboardButton("Yeniköy Karaova"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yokuşbaşı"),
+		tgbotapi.NewKeyboardButton("НАЗАД"),
+	),
+)
+var FethiyeKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akarca"),
+		tgbotapi.NewKeyboardButton("Babataşı"),
+		tgbotapi.NewKeyboardButton("Bozyer"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Cami"),
+		tgbotapi.NewKeyboardButton("Çamköy"),
+		tgbotapi.NewKeyboardButton("Çatalarık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çenger"),
+		tgbotapi.NewKeyboardButton("Çiftlik"),
+		tgbotapi.NewKeyboardButton("Cumhuriyet"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Eldirek"),
+		tgbotapi.NewKeyboardButton("Esenköy"),
+		tgbotapi.NewKeyboardButton("Faralya"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Foça"),
+		tgbotapi.NewKeyboardButton("Göcek"),
+		tgbotapi.NewKeyboardButton("Gökben"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gökçeovacık"),
+		tgbotapi.NewKeyboardButton("İncirköy"),
+		tgbotapi.NewKeyboardButton("İnlice"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Karaağaç"),
+		tgbotapi.NewKeyboardButton("Karacaören"),
+		tgbotapi.NewKeyboardButton("Karacula"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Karagedik"),
+		tgbotapi.NewKeyboardButton("Karagözler"),
+		tgbotapi.NewKeyboardButton("Karakeçililer"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kargı"),
+		tgbotapi.NewKeyboardButton("Kayaköy"),
+		tgbotapi.NewKeyboardButton("Kesikkapı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kızılbel"),
+		tgbotapi.NewKeyboardButton("Koruköy"),
+		tgbotapi.NewKeyboardButton("Menteşeoğlu"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Nif"),
+		tgbotapi.NewKeyboardButton("Ölüdeniz"),
+		tgbotapi.NewKeyboardButton("Patlangıç"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Pazaryeri"),
+		tgbotapi.NewKeyboardButton("Sögütlü"),
+		tgbotapi.NewKeyboardButton("Taşyaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Tuzla"),
+		tgbotapi.NewKeyboardButton("Yakacık"),
+		tgbotapi.NewKeyboardButton("Yanıklar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yeni"),
+		tgbotapi.NewKeyboardButton("Yeşilüzümlü"),
+	),
+
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+
+var DalamanKeyboardTur = tgbotapi.NewReplyKeyboard(
+
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akçataş"),
+		tgbotapi.NewKeyboardButton("Altıntas"),
+		tgbotapi.NewKeyboardButton("Atakent"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bezkese"),
+		tgbotapi.NewKeyboardButton("Bozbel"),
+		tgbotapi.NewKeyboardButton("Çöğmen"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Darıyeri"),
+		tgbotapi.NewKeyboardButton("Ege"),
+		tgbotapi.NewKeyboardButton("Elcik"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gürköy"),
+		tgbotapi.NewKeyboardButton("Gürleyk"),
+		tgbotapi.NewKeyboardButton("Hürriyet"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kapukargın"),
+		tgbotapi.NewKeyboardButton("Karacaağaç"),
+		tgbotapi.NewKeyboardButton("Karaçalı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kargınkürü"),
+		tgbotapi.NewKeyboardButton("Kavacık"),
+		tgbotapi.NewKeyboardButton("Kayadibi"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kızılkaya"),
+		tgbotapi.NewKeyboardButton("Merkez"),
+		tgbotapi.NewKeyboardButton("Narlı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Sabunlu"),
+		tgbotapi.NewKeyboardButton("Şerefler"),
+		tgbotapi.NewKeyboardButton("Söğütlüyurt"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Taşbaşı"),
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+
+var KavaklidereKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bakırcılar"),
+		tgbotapi.NewKeyboardButton("Çamlıbel"),
+		tgbotapi.NewKeyboardButton("Çamlıyurt"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çavdır"),
+		tgbotapi.NewKeyboardButton("Çayboyu"),
+		tgbotapi.NewKeyboardButton("Cumhuriyet"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Derebağ"),
+		tgbotapi.NewKeyboardButton("Kurucuova"),
+		tgbotapi.NewKeyboardButton("Menteşe"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Nebiler"),
+		tgbotapi.NewKeyboardButton("Ortaköy"),
+		tgbotapi.NewKeyboardButton("Salkım"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yeni"),
+		tgbotapi.NewKeyboardButton("Yeşilköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+
+var KoycegizKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akköprü"),
+		tgbotapi.NewKeyboardButton("Balcılar"),
+		tgbotapi.NewKeyboardButton("Beyobası"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çandır"),
+		tgbotapi.NewKeyboardButton("Çayhisar"),
+		tgbotapi.NewKeyboardButton("Döğüşbelen"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ekincik"),
+		tgbotapi.NewKeyboardButton("Gelişim"),
+		tgbotapi.NewKeyboardButton("Gülpınar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hamitköy"),
+		tgbotapi.NewKeyboardButton("Karaçam"),
+		tgbotapi.NewKeyboardButton("Kavakarasi"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Köyceğiz"),
+		tgbotapi.NewKeyboardButton("Otmanlar"),
+		tgbotapi.NewKeyboardButton("Pınar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Sazak"),
+		tgbotapi.NewKeyboardButton("Sultaniye"),
+		tgbotapi.NewKeyboardButton("Toparlar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ulucami"),
+		tgbotapi.NewKeyboardButton("Yangı"),
+		tgbotapi.NewKeyboardButton("Yayla"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yeni"),
+		tgbotapi.NewKeyboardButton("Yeşilköy"),
+		tgbotapi.NewKeyboardButton("Zaferler"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Zeytinalanı"),
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+
+var MarmarisKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Adaköy"),
+		tgbotapi.NewKeyboardButton("Armutalan"),
+		tgbotapi.NewKeyboardButton("Bayır"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Beldibi"),
+		tgbotapi.NewKeyboardButton("Bozburun"),
+		tgbotapi.NewKeyboardButton("Çamdibi"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çamlı"),
+		tgbotapi.NewKeyboardButton("Çetibeli"),
+		tgbotapi.NewKeyboardButton("Çıldır"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hatipirimi"),
+		tgbotapi.NewKeyboardButton("Hisarönü"),
+		tgbotapi.NewKeyboardButton("İçmeler"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Karaca"),
+		tgbotapi.NewKeyboardButton("Kemeraltı"),
+		tgbotapi.NewKeyboardButton("Orhaniye"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Osmaniye"),
+		tgbotapi.NewKeyboardButton("Sarıana"),
+		tgbotapi.NewKeyboardButton("Selimiye"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Siteler"),
+		tgbotapi.NewKeyboardButton("Söğüt"),
+		tgbotapi.NewKeyboardButton("Taşlıca"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Tepe"),
+		tgbotapi.NewKeyboardButton("Turgut"),
+		tgbotapi.NewKeyboardButton("Turunç"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yeşilbelde"),
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+
+var MenteseKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akçaova"),
+		tgbotapi.NewKeyboardButton("Akkaya"),
+		tgbotapi.NewKeyboardButton("Akyer"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Algı"),
+		tgbotapi.NewKeyboardButton("Avcılar"),
+		tgbotapi.NewKeyboardButton("Bağyaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Balıbey"),
+		tgbotapi.NewKeyboardButton("Bayır"),
+		tgbotapi.NewKeyboardButton("Bozyer"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çakmak"),
+		tgbotapi.NewKeyboardButton("Camikebir"),
+		tgbotapi.NewKeyboardButton("Çamoluk"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çatakbağyaka"),
+		tgbotapi.NewKeyboardButton("Çaybükü"),
+		tgbotapi.NewKeyboardButton("Çiftlik"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çırpı"),
+		tgbotapi.NewKeyboardButton("Dağdibi"),
+		tgbotapi.NewKeyboardButton("Dağpınar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Denizova"),
+		tgbotapi.NewKeyboardButton("Derinkuyu"),
+		tgbotapi.NewKeyboardButton("Doğan"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Dokuzçam"),
+		tgbotapi.NewKeyboardButton("Düğerek"),
+		tgbotapi.NewKeyboardButton("Emirbeyazıt"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Esençay"),
+		tgbotapi.NewKeyboardButton("Fadıl"),
+		tgbotapi.NewKeyboardButton("Gazeller"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Göktepe"),
+		tgbotapi.NewKeyboardButton("Gülağzı"),
+		tgbotapi.NewKeyboardButton("Günlüce"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hacırüstem"),
+		tgbotapi.NewKeyboardButton("İkizce"),
+		tgbotapi.NewKeyboardButton("Kafaca"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Karacaören"),
+		tgbotapi.NewKeyboardButton("Karamehmet"),
+		tgbotapi.NewKeyboardButton("Karşıyaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kiramettin"),
+		tgbotapi.NewKeyboardButton("Kıran"),
+		tgbotapi.NewKeyboardButton("Kötekli"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kozağaç"),
+		tgbotapi.NewKeyboardButton("Kuyucak"),
+		tgbotapi.NewKeyboardButton("Kuzluk"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Meke"),
+		tgbotapi.NewKeyboardButton("Muratlar"),
+		tgbotapi.NewKeyboardButton("Muslihittin"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Müştakbey"),
+		tgbotapi.NewKeyboardButton("Orhaniye"),
+		tgbotapi.NewKeyboardButton("Orta"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ortaköy"),
+		tgbotapi.NewKeyboardButton("Özlüce"),
+		tgbotapi.NewKeyboardButton("Paşapınarı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Salihpaşalar"),
+		tgbotapi.NewKeyboardButton("Sarnıç"),
+		tgbotapi.NewKeyboardButton("Şenyayla"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Şeyh"),
+		tgbotapi.NewKeyboardButton("Sungur"),
+		tgbotapi.NewKeyboardButton("Taşlı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yaraş"),
+		tgbotapi.NewKeyboardButton("Yemişendere"),
+		tgbotapi.NewKeyboardButton("Yenibağyaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yenice"),
+		tgbotapi.NewKeyboardButton("Yeniköy"),
+		tgbotapi.NewKeyboardButton("Yeniköy Yerkesik"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yerkesik"),
+		tgbotapi.NewKeyboardButton("Yeşilyurt"),
+		tgbotapi.NewKeyboardButton("Yörükoğlu"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Zeytin"),
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+
+var MilasKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ağaçlıhüyük"),
+		tgbotapi.NewKeyboardButton("Ahmetçavuş-Hayıtlı"),
+		tgbotapi.NewKeyboardButton("Akçakaya"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akçalı"),
+		tgbotapi.NewKeyboardButton("Akkovanlık"),
+		tgbotapi.NewKeyboardButton("Akyol"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Alaçam"),
+		tgbotapi.NewKeyboardButton("Alatepe"),
+		tgbotapi.NewKeyboardButton("Aslanyaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Avşar"),
+		tgbotapi.NewKeyboardButton("Aydınlıkevler"),
+		tgbotapi.NewKeyboardButton("Bafa"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bağdamları"),
+		tgbotapi.NewKeyboardButton("Baharlı"),
+		tgbotapi.NewKeyboardButton("Bahçe"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bahçeburun"),
+		tgbotapi.NewKeyboardButton("Balcılar"),
+		tgbotapi.NewKeyboardButton("Bayır"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Beçin"),
+		tgbotapi.NewKeyboardButton("Beyciler"),
+		tgbotapi.NewKeyboardButton("Boğaziçi"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bozalan"),
+		tgbotapi.NewKeyboardButton("Bozbük"),
+		tgbotapi.NewKeyboardButton("Burgaz"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çakıralan"),
+		tgbotapi.NewKeyboardButton("Çallı"),
+		tgbotapi.NewKeyboardButton("Çamköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çamlıbelen"),
+		tgbotapi.NewKeyboardButton("Çamlıca"),
+		tgbotapi.NewKeyboardButton("Çamlıyurt"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çamovalı"),
+		tgbotapi.NewKeyboardButton("Çandır"),
+		tgbotapi.NewKeyboardButton("Çiftlik"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çınarlı"),
+		tgbotapi.NewKeyboardButton("Çökertme"),
+		tgbotapi.NewKeyboardButton("Çomakdağkızılağaç"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çukur"),
+		tgbotapi.NewKeyboardButton("CumhurKılavuziyet"),
+		tgbotapi.NewKeyboardButton("Damlıboğaz"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Danişment"),
+		tgbotapi.NewKeyboardButton("Demirciler"),
+		tgbotapi.NewKeyboardButton("Dere"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Derince"),
+		tgbotapi.NewKeyboardButton("Dibekdere"),
+		tgbotapi.NewKeyboardButton("Dörttepe"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Eğridere"),
+		tgbotapi.NewKeyboardButton("Ekinanbarı"),
+		tgbotapi.NewKeyboardButton("Ekindere"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ekizköy"),
+		tgbotapi.NewKeyboardButton("Ekiztaş"),
+		tgbotapi.NewKeyboardButton("Emek"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Epçe"),
+		tgbotapi.NewKeyboardButton("Etrenli"),
+		tgbotapi.NewKeyboardButton("Fesleğen"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Firuzpaşa-Gazipaşa"),
+		tgbotapi.NewKeyboardButton("Gökbel"),
+		tgbotapi.NewKeyboardButton("Gökçeler"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Göldere"),
+		tgbotapi.NewKeyboardButton("Gölyaka"),
+		tgbotapi.NewKeyboardButton("Güllük"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gümüşlük"),
+		tgbotapi.NewKeyboardButton("Güneş"),
+		tgbotapi.NewKeyboardButton("Günlük"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gürçamlar"),
+		tgbotapi.NewKeyboardButton("Gürceğiz"),
+		tgbotapi.NewKeyboardButton("Hacıabti"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hacıahmetler"),
+		tgbotapi.NewKeyboardButton("Hacı İlyas"),
+		tgbotapi.NewKeyboardButton("Hasanlar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hisarbaşı-Hoca"),
+		tgbotapi.NewKeyboardButton("Hisarcık"),
+		tgbotapi.NewKeyboardButton("Hüsamlar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("İçme"),
+		tgbotapi.NewKeyboardButton("İsmet Paşa"),
+		tgbotapi.NewKeyboardButton("Kafaca"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kalem"),
+		tgbotapi.NewKeyboardButton("Kalınağıl"),
+		tgbotapi.NewKeyboardButton("Kandak"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kapıkırı"),
+		tgbotapi.NewKeyboardButton("Karacaağaç"),
+		tgbotapi.NewKeyboardButton("Karacahisar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Karahayıt"),
+		tgbotapi.NewKeyboardButton("Karakuyu"),
+		tgbotapi.NewKeyboardButton("Karapınar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kargıcak"),
+		tgbotapi.NewKeyboardButton("Karşıyaka"),
+		tgbotapi.NewKeyboardButton("Kayabaşı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kayabükü"),
+		tgbotapi.NewKeyboardButton("Kayadere"),
+		tgbotapi.NewKeyboardButton("Kazıklı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kemikler"),
+		tgbotapi.NewKeyboardButton("Ketendere"),
+		tgbotapi.NewKeyboardButton("Kılavuz"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kırcağız"),
+		tgbotapi.NewKeyboardButton("Kısırlar2"),
+		tgbotapi.NewKeyboardButton("Kıyıkışlacık3"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kızılağaç"),
+		tgbotapi.NewKeyboardButton("Kızılcakuyu"),
+		tgbotapi.NewKeyboardButton("Kızılcayıkık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Konak"),
+		tgbotapi.NewKeyboardButton("Koru"),
+		tgbotapi.NewKeyboardButton("Korucuk"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Köşk"),
+		tgbotapi.NewKeyboardButton("Küçükdibekdere"),
+		tgbotapi.NewKeyboardButton("Kultak"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kurudere"),
+		tgbotapi.NewKeyboardButton("Kuzyaka"),
+		tgbotapi.NewKeyboardButton("Menteş"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Meşelik"),
+		tgbotapi.NewKeyboardButton("Narhisar"),
+		tgbotapi.NewKeyboardButton("Olukbaşı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ören"),
+		tgbotapi.NewKeyboardButton("Ortaköy"),
+		tgbotapi.NewKeyboardButton("Ovakışlacık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Pinar"),
+		tgbotapi.NewKeyboardButton("Pınararası"),
+		tgbotapi.NewKeyboardButton("Pınarcık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Sakarkaya"),
+		tgbotapi.NewKeyboardButton("Sarıkaya"),
+		tgbotapi.NewKeyboardButton("Savran"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Sek"),
+		tgbotapi.NewKeyboardButton("Selimiye"),
+		tgbotapi.NewKeyboardButton("Şenköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Şevketiye"),
+		tgbotapi.NewKeyboardButton("Söğütçük"),
+		tgbotapi.NewKeyboardButton("Türkevleri"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Tuzabat"),
+		tgbotapi.NewKeyboardButton("Ulaş"),
+		tgbotapi.NewKeyboardButton("Yaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yaşyer"),
+		tgbotapi.NewKeyboardButton("Yoğunoluk"),
+		tgbotapi.NewKeyboardButton("Yusufca"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+
+var SeydikemerKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Alaçat"),
+		tgbotapi.NewKeyboardButton("Arifler"),
+		tgbotapi.NewKeyboardButton("Arsaköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Atlıdere"),
+		tgbotapi.NewKeyboardButton("Bağlıağaç"),
+		tgbotapi.NewKeyboardButton("Bayırköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bekçiler"),
+		tgbotapi.NewKeyboardButton("Belen"),
+		tgbotapi.NewKeyboardButton("Boğalar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Boğaziçi"),
+		tgbotapi.NewKeyboardButton("Çaltılar"),
+		tgbotapi.NewKeyboardButton("Çaltıözü"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çamurköy"),
+		tgbotapi.NewKeyboardButton("Çatak"),
+		tgbotapi.NewKeyboardButton("Çayan"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çaykenarı"),
+		tgbotapi.NewKeyboardButton("Ceylan"),
+		tgbotapi.NewKeyboardButton("Çobanisa"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çobanlar"),
+		tgbotapi.NewKeyboardButton("Çökek"),
+		tgbotapi.NewKeyboardButton("Çukurincir"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Cumhuriyet"),
+		tgbotapi.NewKeyboardButton("Demirler"),
+		tgbotapi.NewKeyboardButton("Dereköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Dodurga"),
+		tgbotapi.NewKeyboardButton("Doğanlar"),
+		tgbotapi.NewKeyboardButton("Döğer"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Dont"),
+		tgbotapi.NewKeyboardButton("Eşen"),
+		tgbotapi.NewKeyboardButton("Gerişburnu"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Girmeler"),
+		tgbotapi.NewKeyboardButton("Gölbent"),
+		tgbotapi.NewKeyboardButton("Güneşli"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hacıosmanlar"),
+		tgbotapi.NewKeyboardButton("İzzettinköy"),
+		tgbotapi.NewKeyboardButton("Kabaağaç"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kadıköy"),
+		tgbotapi.NewKeyboardButton("Karadere"),
+		tgbotapi.NewKeyboardButton("Karaköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kayabaşı"),
+		tgbotapi.NewKeyboardButton("Kayacık"),
+		tgbotapi.NewKeyboardButton("Kayadibi"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kıncılar"),
+		tgbotapi.NewKeyboardButton("Kınık"),
+		tgbotapi.NewKeyboardButton("Korubükü"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kumluova"),
+		tgbotapi.NewKeyboardButton("Menekşe"),
+		tgbotapi.NewKeyboardButton("Minare"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ören"),
+		tgbotapi.NewKeyboardButton("Ortaköy"),
+		tgbotapi.NewKeyboardButton("Paşalı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Sahilceylan"),
+		tgbotapi.NewKeyboardButton("Sarıyer"),
+		tgbotapi.NewKeyboardButton("Seki"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Seydiler"),
+		tgbotapi.NewKeyboardButton("Söğütlüdere"),
+		tgbotapi.NewKeyboardButton("Temel"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Uğurlu"),
+		tgbotapi.NewKeyboardButton("Yakabağ"),
+		tgbotapi.NewKeyboardButton("Yakaköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yayla Eldirek"),
+		tgbotapi.NewKeyboardButton("Yayla Gökben"),
+		tgbotapi.NewKeyboardButton("Yayla Karaçulha"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yaylapatlangıç"),
+		tgbotapi.NewKeyboardButton("Zorlar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+
+var UlaKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akçapınar"),
+		tgbotapi.NewKeyboardButton("Akyaka "),
+		tgbotapi.NewKeyboardButton("Alparslan"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Arıcılar"),
+		tgbotapi.NewKeyboardButton("Armutcuk"),
+		tgbotapi.NewKeyboardButton("Ataköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Ayazkıyı"),
+		tgbotapi.NewKeyboardButton("Çiçekli"),
+		tgbotapi.NewKeyboardButton("Çıtlık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çörüş"),
+		tgbotapi.NewKeyboardButton("Demirtaş"),
+		tgbotapi.NewKeyboardButton("Elmalı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Esentepe"),
+		tgbotapi.NewKeyboardButton("Gökçe"),
+		tgbotapi.NewKeyboardButton("Gökova"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gölcük"),
+		tgbotapi.NewKeyboardButton("Karabörtlen"),
+		tgbotapi.NewKeyboardButton("Kavakçalı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kıra"),
+		tgbotapi.NewKeyboardButton("Kızılağaç"),
+		tgbotapi.NewKeyboardButton("Kızılyaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Köprübaşı"),
+		tgbotapi.NewKeyboardButton("Örnekköy"),
+		tgbotapi.NewKeyboardButton("Portakallık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Sarayyanı"),
+		tgbotapi.NewKeyboardButton("Şirinköy"),
+		tgbotapi.NewKeyboardButton("Turgut"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yaylasöğüt"),
+		tgbotapi.NewKeyboardButton("Yeşilçam"),
+		tgbotapi.NewKeyboardButton("Yeşilova"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+
+var YataganKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akgedik"),
+		tgbotapi.NewKeyboardButton("Akyol"),
+		tgbotapi.NewKeyboardButton("Alaşar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Atatürk"),
+		tgbotapi.NewKeyboardButton("Bağyaka"),
+		tgbotapi.NewKeyboardButton("Bahçeyaka"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bencik"),
+		tgbotapi.NewKeyboardButton("Bozarmut"),
+		tgbotapi.NewKeyboardButton("Bozüyük"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çakırlar"),
+		tgbotapi.NewKeyboardButton("Çamlıca"),
+		tgbotapi.NewKeyboardButton("Cazkırlar"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çukuröz"),
+		tgbotapi.NewKeyboardButton("Cumhuriyet"),
+		tgbotapi.NewKeyboardButton("Dere"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Deştin"),
+		tgbotapi.NewKeyboardButton("Doğanköy"),
+		tgbotapi.NewKeyboardButton("Elmacık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Esenköy"),
+		tgbotapi.NewKeyboardButton("Eskihisar"),
+		tgbotapi.NewKeyboardButton("Gökgedik"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gökpınar"),
+		tgbotapi.NewKeyboardButton("Hacıbayramlar"),
+		tgbotapi.NewKeyboardButton("Hacıveliler"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hisarardı"),
+		tgbotapi.NewKeyboardButton("Kadıköy"),
+		tgbotapi.NewKeyboardButton("Kafacakaplancık"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kapubağ"),
+		tgbotapi.NewKeyboardButton("Katrancı"),
+		tgbotapi.NewKeyboardButton("Kavak"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kırıkköy"),
+		tgbotapi.NewKeyboardButton("Köklük"),
+		tgbotapi.NewKeyboardButton("Konak"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kozağaç"),
+		tgbotapi.NewKeyboardButton("Madenler"),
+		tgbotapi.NewKeyboardButton("Mesken"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Nebiköy"),
+		tgbotapi.NewKeyboardButton("Şahinler"),
+		tgbotapi.NewKeyboardButton("Şeref"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Turgut"),
+		tgbotapi.NewKeyboardButton("Turgutlar"),
+		tgbotapi.NewKeyboardButton("Yava"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yayla"),
+		tgbotapi.NewKeyboardButton("Yeni"),
+		tgbotapi.NewKeyboardButton("Yenikarakuyu"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yeniköy"),
+		tgbotapi.NewKeyboardButton("Yeşilbağcılar"),
+		tgbotapi.NewKeyboardButton("Yeşilköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yukarıyayla"),
+		tgbotapi.NewKeyboardButton("Zeytinköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+
+var OrtacaKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akıncı"),
+		tgbotapi.NewKeyboardButton("Arıkbaşı"),
+		tgbotapi.NewKeyboardButton("Atatürk"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bahçelievler"),
+		tgbotapi.NewKeyboardButton("Beşköprü"),
+		tgbotapi.NewKeyboardButton("Çaylı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Cumhuriyet"),
+		tgbotapi.NewKeyboardButton("Dalaklı"),
+		tgbotapi.NewKeyboardButton("Dalyan"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Dereköy"),
+		tgbotapi.NewKeyboardButton("Dikmekavak"),
+		tgbotapi.NewKeyboardButton("Ekşiliyurt"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Eskiköy"),
+		tgbotapi.NewKeyboardButton("Fevziye"),
+		tgbotapi.NewKeyboardButton("Gökbel"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gölbaşı"),
+		tgbotapi.NewKeyboardButton("Güzelyurt"),
+		tgbotapi.NewKeyboardButton("Karaburun"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Karadonlar"),
+		tgbotapi.NewKeyboardButton("Kemaliye"),
+		tgbotapi.NewKeyboardButton("Mergenli"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Okçular"),
+		tgbotapi.NewKeyboardButton("Sarıgerme"),
+		tgbotapi.NewKeyboardButton("Tepearası"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Terzialiler"),
+		tgbotapi.NewKeyboardButton("Yerbelen"),
+		tgbotapi.NewKeyboardButton("Yeşilyurt"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+
+var DatcaKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Cumalı"),
+		tgbotapi.NewKeyboardButton("Datça"),
+		tgbotapi.NewKeyboardButton("Emecik"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Hızırşah"),
+		tgbotapi.NewKeyboardButton("İskele"),
+		tgbotapi.NewKeyboardButton("Karaköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kızlan"),
+		tgbotapi.NewKeyboardButton("Mesudiye"),
+		tgbotapi.NewKeyboardButton("Reşadiye"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Sındı"),
+		tgbotapi.NewKeyboardButton("Yaka"),
+		tgbotapi.NewKeyboardButton("Yazı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
+)
+
+var BodrumKeyboardTur = tgbotapi.NewReplyKeyboard(
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Akçaalan"),
+		tgbotapi.NewKeyboardButton("Akyarlar"),
+		tgbotapi.NewKeyboardButton("Bahçelievler"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Bahçeyaka"),
+		tgbotapi.NewKeyboardButton("Bitez"),
+		tgbotapi.NewKeyboardButton("Çamarası"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çamlık"),
+		tgbotapi.NewKeyboardButton("Çarşı"),
+		tgbotapi.NewKeyboardButton("Cevat Şakir"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Çiftlik"),
+		tgbotapi.NewKeyboardButton("Çırkan"),
+		tgbotapi.NewKeyboardButton("Çömlekçi"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Cumhuriyet"),
+		tgbotapi.NewKeyboardButton("Dağbelen"),
+		tgbotapi.NewKeyboardButton("Dereköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Dirmil"),
+		tgbotapi.NewKeyboardButton("Eskiçeşme"),
+		tgbotapi.NewKeyboardButton("Farilya"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Geriş"),
+		tgbotapi.NewKeyboardButton("Gökpınar"),
+		tgbotapi.NewKeyboardButton("Gölbaşı"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gölköy"),
+		tgbotapi.NewKeyboardButton("Göltürkbükü"),
+		tgbotapi.NewKeyboardButton("Gümbet"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Gümüşlük"),
+		tgbotapi.NewKeyboardButton("Gündoğan"),
+		tgbotapi.NewKeyboardButton("Gürece"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Güvercinlik"),
+		tgbotapi.NewKeyboardButton("İslamhaneleri"),
+		tgbotapi.NewKeyboardButton("Karabağ"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Karaova"),
+		tgbotapi.NewKeyboardButton("Kemer"),
+		tgbotapi.NewKeyboardButton("Kızıkağaç"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Konacık"),
+		tgbotapi.NewKeyboardButton("Koyunbaba"),
+		tgbotapi.NewKeyboardButton("Küçükbük"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Kumbahçe"),
+		tgbotapi.NewKeyboardButton("Kumköy"),
+		tgbotapi.NewKeyboardButton("Mazıköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Mumcular"),
+		tgbotapi.NewKeyboardButton("Müskebi"),
+		tgbotapi.NewKeyboardButton("Ortakentyahşi"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Peksimet"),
+		tgbotapi.NewKeyboardButton("Pınarlıbelen"),
+		tgbotapi.NewKeyboardButton("Sazköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Tepecik"),
+		tgbotapi.NewKeyboardButton("Tepecik Karaova"),
+		tgbotapi.NewKeyboardButton("Torba"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Turgutreis"),
+		tgbotapi.NewKeyboardButton("Türkbükü"),
+		tgbotapi.NewKeyboardButton("Türkkuyusu"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Umurca"),
+		tgbotapi.NewKeyboardButton("Yahşi"),
+		tgbotapi.NewKeyboardButton("Yakaköy"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yalıkavak"),
+		tgbotapi.NewKeyboardButton("Yeniköy"),
+		tgbotapi.NewKeyboardButton("Yeniköy Karaova"),
+	),
+	tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Yokuşbaşı"),
+		tgbotapi.NewKeyboardButton("GERI"),
+	),
 )
