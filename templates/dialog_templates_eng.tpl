@@ -12,7 +12,7 @@
 {{end}}
 
 {{define "alert"}}
-Please be aware that there is a *{{.Resource}} outage* planned in *{{.District}} {{.City}}* from {{escape (format (.StartDate))}} to {{escape (format (.EndDate))}}{{if gt (len .Notes ) 3 }}
+Please be aware that there is a *{{.Resource}} outage* planned in *{{escape (.District)}} {{.City}}* from {{escape (format (.StartDate))}} to {{escape (format (.EndDate))}}{{if gt (len .Notes ) 3 }}
 *In the following areas and streets:*
 {{escape (.Notes)}}{{end}}
 {{end}}
@@ -51,7 +51,7 @@ Now pick the alert period:
 {{end}}
 
 {{define "pickDistr_confirm"}}
-You have chosen *{{.PickedDistrict}}* neighborhood in *{{.PickedCity}}* city{{escape ("!")}}
+You have chosen *{{escape (.PickedDistrict)}}* neighborhood in *{{.PickedCity}}* city{{escape ("!")}}
 {{end}}
 
 {{define "change_location_confirm"}}
@@ -63,11 +63,11 @@ Your subscription has been sucsessfully updated{{escape ("!")}} From now on you 
 {{end}}
 
 {{define "set_period_confirm"}}
-Your subscription has been sucsessfully set{{escape ("!")}} From now on you will get notifications about outages in *{{.PickedDistrict}}* *{{.PickedCity}}* in *{{.PickedPeriod}}* hours before it starts{{escape (".")}}
+Your subscription has been sucsessfully set{{escape ("!")}} From now on you will get notifications about outages in *{{escape (.PickedDistrict)}}* *{{.PickedCity}}* in *{{.PickedPeriod}}* hours before it starts{{escape (".")}}
 {{end}}
 
 {{define "show_sub"}}
-You are subscribed to get notifications about outages in *{{.District}}* neighborhood in *{{.City}}* city in *{{.Period}}* hours before it starts{{escape (".")}}
+You are subscribed to get notifications about outages in *{{escape (.District)}}* neighborhood in *{{.City}}* city in *{{.Period}}* hours before it starts{{escape (".")}}
 {{end}}
 
 {{define "no_subs"}}
