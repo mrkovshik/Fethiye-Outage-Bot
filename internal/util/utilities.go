@@ -18,6 +18,7 @@ func Normalize(s string) ([]string, error) {
 		err = errors.Wrap(err, "Error transforming input query")
 		return []string{}, err
 	}
+	output = strings.Replace(output, "ı", "i", -1)
 	re, err := regexp.Compile(`[\p{L}\d_]+`)
 	if err != nil {
 		err = errors.Wrap(err, "Error compiling regexp input query")
